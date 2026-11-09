@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101a2b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OrçaFrio">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>OrçaFrio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--bg:#f3f6fa;--panel:#fff;--ink:#172235;--muted:#718096;--line:#e4eaf1;--navy:#101a2b;--navy2:#192840;--blue:#1677e8;--cyan:#36c5d9;--green:#13966a;--red:#d94b57;--amber:#c98216;--shadow:0 12px 35px #15243a0d;--r:16px;--display:'Barlow Condensed','Arial Narrow',sans-serif;--body:'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px var(--body)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.shell{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
+.side{background:var(--navy);color:#fff;padding:24px 16px;display:flex;flex-direction:column;gap:24px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;align-items:center;gap:11px;padding:0 8px}
+.brandmark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;font-size:20px;font-weight:800}
+.brand strong{font:800 24px var(--display);letter-spacing:.3px}
+.brand small{display:block;color:#8fa2bc;font-size:10px;letter-spacing:1.6px;text-transform:uppercase}
+.navlabel{color:#71839d;font-size:10px;font-weight:800;letter-spacing:1.4px;padding:0 12px;margin:6px 0}
+.nav{display:grid;gap:5px}
+.nav button{border:0;background:transparent;color:#aebbd0;text-align:left;padding:12px;border-radius:11px;display:flex;align-items:center;gap:12px;font-weight:600}
+.nav button:hover,.nav button.active{background:#20334f;color:#fff}
+.nav .ico{width:20px;text-align:center;font-size:17px}
+.sidefoot{margin-top:auto;border-top:1px solid #293a52;padding:15px 8px;color:#8293aa;font-size:11px;line-height:1.6}
+.main{min-width:0}
+.top{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:5}
+.crumb{font-size:13px;color:var(--muted)}
+.crumb b{color:var(--ink)}
+.topright{display:flex;align-items:center;gap:10px}
+.pill{background:#eaf4ff;color:#1769c2;border-radius:30px;padding:7px 11px;font-size:11px;font-weight:800}
+.avatar{width:34px;height:34px;border-radius:50%;background:#e7eff9;color:#245c9c;display:grid;place-items:center;font-weight:800}
+.content{max-width:1440px;margin:auto;padding:30px 32px 90px}
+.pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:24px}
+.eyebrow{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--blue);font-weight:800}
+.pagehead h1{font:800 34px var(--display);margin:4px 0}
+.sub{color:var(--muted);font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:10px 14px;font-weight:700;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{border-color:#b7c8dc}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.dark{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.danger{color:var(--red)}
+.btn.small{padding:7px 10px;font-size:12px}
+.grid{display:grid;gap:16px}
+.grid>*{min-width:0}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:19px}
+.stat{display:flex;justify-content:space-between;align-items:flex-start}
+.stat .label{color:var(--muted);font-size:12px;font-weight:600}
+.stat .value{font:800 32px var(--display);margin-top:8px}
+.stat .hint{font-size:11px;color:var(--muted);margin-top:3px}
+.stat .symbol{width:38px;height:38px;border-radius:12px;background:#eaf3ff;color:var(--blue);display:grid;place-items:center;font-size:18px}
+.cols{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+.cardhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.cardhead h3{margin:0;font-size:14px}
+.muted{color:var(--muted)}
+.tablewrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:600px}
+th{text-align:left;color:#8491a3;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:11px 10px;border-bottom:1px solid var(--line)}
+td{padding:13px 10px;border-bottom:1px solid #edf1f5;font-size:12px;vertical-align:top}
+tr:last-child td{border-bottom:0}
+.tag{display:inline-flex;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:800;background:#edf1f6;color:#64748b;white-space:nowrap}
+.tag.aprovado,.tag.ativo,.tag.concluido{background:#e5f7ef;color:#13845d}
+.tag.enviado,.tag.programado{background:#eaf3ff;color:#1769c2}
+.tag.recusado,.tag.vencido{background:#fff0f0;color:#c23e49}
+.tag.rascunho,.tag.pendente{background:#fff5e5;color:#a66a0b}
+.empty{padding:34px 15px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);margin-bottom:5px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}
+.toolbar select{width:auto;border:1px solid #dfe6ee;background:#fff;border-radius:9px;padding:11px 12px;color:var(--ink)}
+.field{display:grid;gap:6px;margin-bottom:13px}
+.field label{font-size:11px;font-weight:800;color:#66758a}
+.field input,.field select,.field textarea,.search{width:100%;border:1px solid #dfe6ee;background:#fff;border-radius:9px;padding:11px 12px;color:var(--ink);outline:none}
+.field input:focus,.field select:focus,.field textarea:focus,.search:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1677e814}
+.field textarea{min-height:80px;resize:vertical}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}
+.span2{grid-column:span 2}
+.formh{margin:18px 0 10px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue)}
+.modalback{position:fixed;inset:0;background:#08132388;display:none;align-items:center;justify-content:center;padding:15px;z-index:20}
+.modalback.show{display:flex}
+.modal{background:#fff;width:min(720px,100%);max-height:92vh;overflow:auto;border-radius:18px;padding:22px;box-shadow:0 25px 80px #0003}
+.modal.wide{width:min(900px,100%)}
+.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:10px}
+.modalhead h2{font:800 25px var(--display);margin:0}
+.x{border:0;background:#eef2f6;border-radius:8px;width:32px;height:32px;flex:none}
+.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;flex-wrap:wrap}
+.itemrow{display:grid;grid-template-columns:1fr 70px 64px 110px 36px;gap:7px;margin-bottom:8px}
+.itemrow input{min-width:0;border:1px solid var(--line);border-radius:8px;padding:9px;width:100%}
+.taskrow{display:grid;grid-template-columns:1fr 130px 36px;gap:7px;margin-bottom:8px}
+.taskrow input,.taskrow select{min-width:0;border:1px solid var(--line);border-radius:8px;padding:9px;width:100%;background:#fff}
+.totals{margin-left:auto;max-width:280px;display:grid;gap:8px;padding-top:12px}
+.totalrow{display:flex;justify-content:space-between;color:var(--muted)}
+.totalrow strong{color:var(--ink)}
+.totalrow.final{font-size:17px;border-top:1px solid var(--line);padding-top:10px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#15243a;color:#fff;padding:12px 17px;border-radius:10px;opacity:0;pointer-events:none;transition:.2s;z-index:40;box-shadow:0 10px 30px #0003;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.mobilebar{display:none}
+.sectionnote{padding:13px 15px;background:#eef6ff;border:1px solid #d7eaff;color:#285c91;border-radius:11px;font-size:12px;line-height:1.5;margin-bottom:15px}
+.sectionnote.warn{background:#fff7e8;border-color:#f6dfae;color:#8a5a0a}
+.detailgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.detailbox{padding:13px;background:#f7f9fc;border-radius:10px}
+.detailbox small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
+.detailbox b{font-size:13px}
+.inline-actions{display:flex;gap:6px;flex-wrap:wrap}
+.logo-preview{max-width:150px;max-height:70px;object-fit:contain;background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:6px}
+.checks{display:grid;gap:8px}
+.check{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+.check input{width:18px;height:18px;margin:2px 0 0;flex:none}
+.statusbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.statusbar button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:7px 12px;font-weight:700;font-size:12px;color:var(--muted)}
+.statusbar button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.filterchip{display:inline-flex;align-items:center;gap:8px;background:#eaf4ff;color:#1769c2;border-radius:30px;padding:7px 8px 7px 12px;font-size:12px;font-weight:700;margin-bottom:15px}
+.filterchip button{border:0;background:#cfe4fb;border-radius:50%;width:22px;height:22px;color:#1769c2;font-weight:800}
+.doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;font-size:13px;color:var(--ink)}
+.dochead{display:flex;justify-content:space-between;gap:18px;border-bottom:2px solid var(--blue);padding-bottom:16px;margin-bottom:18px;flex-wrap:wrap}
+.dochead-l{display:flex;gap:14px;align-items:center;min-width:0}
+.doclogo{max-height:56px;max-width:140px;object-fit:contain}
+.docco{font:800 24px var(--display);text-transform:uppercase;letter-spacing:.3px;overflow-wrap:anywhere}
+.docsm{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+.dochead-r{text-align:right}
+.doctitle{font:800 26px var(--display);letter-spacing:2px;color:var(--blue)}
+.docgrid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:6px}
+.docgrid>div{min-width:0;overflow-wrap:anywhere}
+.doc small.lb{display:block;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.docsec{margin-top:18px}
+.docsec h4{margin:0 0 6px;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:4px}
+.doc table{min-width:0}
+.doc td,.doc th{padding:9px 8px}
+.doc .r{text-align:right;white-space:nowrap}
+.docsig{margin-top:38px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.docsig div{border-top:1px solid var(--ink);padding-top:6px;min-width:200px;flex:1;font-size:12px}
+.docnote{color:var(--muted);font-size:11px;margin-top:14px}
+@media(max-width:900px){
+.shell{grid-template-columns:1fr}
+.side{display:none}
+.top{padding:0 18px}
+.content{padding:22px 17px 100px}
+.stats{grid-template-columns:repeat(2,1fr)}
+.cols{grid-template-columns:minmax(0,1fr)}
+.mobilebar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);z-index:10;justify-content:space-around;padding:8px 3px calc(8px + env(safe-area-inset-bottom))}
+.mobilebar button{border:0;background:none;color:#718096;font-size:10px;display:grid;gap:3px;justify-items:center;min-width:52px}
+.mobilebar button.active{color:var(--blue);font-weight:800}
+.mobilebar span{font-size:18px}
+.pagehead{align-items:center}
+.pagehead h1{font-size:29px}
+}
+@media(max-width:560px){
+.top{height:58px}
+.pill{display:none}
+.content{padding:18px 13px 100px}
+.stats{gap:9px}
+.card{padding:14px}
+.stat .value{font-size:27px}
+.formgrid{grid-template-columns:1fr}
+.span2{grid-column:auto}
+.detailgrid{grid-template-columns:1fr 1fr}
+.itemrow{grid-template-columns:1fr 1fr 1.4fr 36px}
+.itemrow .desc{grid-column:1/-1}
+.taskrow{grid-template-columns:1fr 108px 36px}
+.pagehead{display:block}
+.pagehead .actions{margin-top:13px}
+.toolbar .search{min-width:100%}
+.docgrid{grid-template-columns:1fr}
+.dochead-r{text-align:left}
+.modal{padding:16px}
+.modalfoot .btn{flex:1 1 auto;justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="side">
+ <div class="brand"><div class="brandmark">❄</div><div><strong>ORÇA<span style="color:#42c4df">FRIO</span></strong><small>gestão técnica</small></div></div>
+ <div><div class="navlabel">PRINCIPAL</div><nav class="nav">
+ <button data-page="dashboard" class="active"><span class="ico">▦</span> Visão geral</button>
+ <button data-page="orcamentos"><span class="ico">▤</span> Orçamentos</button>
+ <button data-page="clientes"><span class="ico">♙</span> Clientes</button>
+ <button data-page="equipamentos"><span class="ico">❄</span> Equipamentos</button>
+ <button data-page="servicos"><span class="ico">⚙</span> Serviços</button>
+ </nav></div>
+ <div><div class="navlabel">MANUTENÇÃO</div><nav class="nav">
+ <button data-page="pmoc"><span class="ico">▣</span> PMOC</button>
+ <button data-page="historico"><span class="ico">◷</span> Histórico</button>
+ </nav></div>
+ <div><div class="navlabel">SISTEMA</div><nav class="nav">
+ <button data-page="empresa"><span class="ico">⌂</span> Minha empresa</button>
+ <button data-page="dados"><span class="ico">⇅</span> Backup e dados</button>
+ </nav></div>
+ <div class="sidefoot">OrçaFrio · Gestão de serviços<br>Seus dados ficam neste dispositivo.</div>
+</aside>
+<main class="main">
+<header class="top"><div class="crumb">OrçaFrio <span style="color:#c4ccd6"> / </span> <b id="crumb">Visão geral</b></div><div class="topright"><span class="pill">● SISTEMA LOCAL</span><div class="avatar" id="avatar">OF</div></div></header>
+<div class="content" id="app"></div>
+</main>
+</div>
+<nav class="mobilebar" id="mobilebar">
+<button data-page="dashboard" class="active"><span>▦</span>Início</button><button data-page="orcamentos"><span>▤</span>Orçamentos</button><button data-page="clientes"><span>♙</span>Clientes</button><button data-page="equipamentos"><span>❄</span>Equip.</button><button data-page="pmoc"><span>▣</span>PMOC</button><button data-page="mais"><span>•••</span>Mais</button>
+</nav>
+<div class="modalback" id="modalback"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhead"><h2 id="modaltitle">Cadastro</h2><button class="x" id="modalx" aria-label="Fechar">✕</button></div><div id="modalbody"></div><div class="modalfoot" id="modalfoot"></div></div></div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const WN=[278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,761,556,556,222,556,333,1000,556,556,333,1000,667,333,1000,556,611,556,556,222,222,333,333,350,556,1000,333,1000,500,333,944,556,500,667,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,333,400,584,333,333,333,556,537,278,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,584,611,556,556,556,556,500,556,500];
+const WB=[278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584,761,556,556,278,556,500,1000,556,556,333,1000,667,333,1000,556,611,556,556,278,278,500,500,350,556,1000,333,1000,556,333,944,556,500,667,278,333,556,556,556,556,280,556,333,737,370,556,584,333,737,333,400,584,333,333,333,611,556,278,333,333,365,556,834,834,834,611,722,722,722,722,722,722,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,556,556,556,556,556,278,278,278,278,611,611,611,611,611,611,611,584,611,611,611,611,611,556,611,556];
+
+/* ======================= Gerador de PDF próprio (sem biblioteca externa) ======================= */
+const WIN={0x2013:0x96,0x2014:0x97,0x2022:0x95,0x2026:0x85,0x201C:0x93,0x201D:0x94,0x2018:0x91,0x2019:0x92,0x20AC:0x80,0x2122:0x99};
+function winCode(ch){let c=ch.charCodeAt(0);if(c<32)return 32;if(c<256&&!(c>=128&&c<160))return c;return WIN[c]||63}
+class Pdf{
+ constructor(title){this.k=72/25.4;this.title=title||'Documento';this.pages=[];this.images=[];this.font=0;this.size=10;this.tc=[0,0,0];this.fc=[0,0,0];this.dc=[0,0,0];this.addPage()}
+ addPage(){this.cur={ops:[],imgs:[]};this.pages.push(this.cur)}
+ n(v){return (Math.round(v*100)/100).toString()}
+ rgb(c){return c.map(v=>(v/255).toFixed(3)).join(' ')}
+ setFont(bold){this.font=bold?1:0}
+ setSize(s){this.size=s}
+ setText(c){this.tc=c}
+ setFill(c){this.fc=c}
+ setDraw(c){this.dc=c}
+ w(str,size){const T=this.font?WB:WN;let t=0;for(const ch of String(str)){const c=winCode(ch);t+=(c>=32?T[c-32]:556)}return t*(size||this.size)/1000/this.k}
+ split(str,maxW){
+  const out=[];
+  for(const para of String(str==null?'':str).split(/\r?\n/)){
+   const words=para.split(/\s+/).filter(Boolean);let line='';
+   if(!words.length){out.push('');continue}
+   for(let word of words){
+    while(this.w(word)>maxW&&word.length>1){let k=word.length-1;while(k>1&&this.w(word.slice(0,k))>maxW)k--;if(line){out.push(line);line=''}out.push(word.slice(0,k));word=word.slice(k)}
+    const t=line?line+' '+word:word;
+    if(this.w(t)<=maxW)line=t;else{out.push(line);line=word}
+   }
+   if(line)out.push(line);
+  }
+  return out;
+ }
+ esc(str){let s='';for(const ch of String(str)){const c=winCode(ch);s+=(c===40||c===41||c===92)?'\\'+String.fromCharCode(c):String.fromCharCode(c)}return s}
+ text(str,x,y,o){
+  o=o||{};let px=x;const wd=this.w(str);
+  if(o.align==='right')px=x-wd;else if(o.align==='center')px=x-wd/2;
+  this.cur.ops.push('BT /F'+(this.font+1)+' '+this.n(this.size)+' Tf '+this.rgb(this.tc)+' rg '+this.n(px*this.k)+' '+this.n((297-y)*this.k)+' Td ('+this.esc(str)+') Tj ET');
+ }
+ line(x1,y1,x2,y2,lw){this.cur.ops.push(this.n((lw||0.3)*this.k)+' w '+this.rgb(this.dc)+' RG '+this.n(x1*this.k)+' '+this.n((297-y1)*this.k)+' m '+this.n(x2*this.k)+' '+this.n((297-y2)*this.k)+' l S')}
+ rect(x,y,w,h){this.cur.ops.push(this.rgb(this.fc)+' rg '+this.n(x*this.k)+' '+this.n((297-y-h)*this.k)+' '+this.n(w*this.k)+' '+this.n(h*this.k)+' re f')}
+ image(img,x,y,w,h){
+  let i=this.images.indexOf(img);if(i<0){this.images.push(img);i=this.images.length-1}
+  if(this.cur.imgs.indexOf(i)<0)this.cur.imgs.push(i);
+  this.cur.ops.push('q '+this.n(w*this.k)+' 0 0 '+this.n(h*this.k)+' '+this.n(x*this.k)+' '+this.n((297-y-h)*this.k)+' cm /Im'+(i+1)+' Do Q');
+ }
+ output(){
+  const enc=new TextEncoder(),parts=[],offs=[];let len=0;
+  const bin=s=>{const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i)&255;return u};
+  const push=p=>{const u=typeof p==='string'?bin(p):p;parts.push(u);len+=u.length};
+  const obj=(id,body)=>{offs[id]=len;push(id+' 0 obj\n');if(Array.isArray(body))body.forEach(push);else push(body);push('\nendobj\n')};
+  const ni=this.images.length,first=5+ni;
+  push('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+  obj(2,'<< /Type /Pages /Kids ['+this.pages.map((p,i)=>(first+i*2)+' 0 R').join(' ')+'] /Count '+this.pages.length+' >>');
+  obj(3,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+  obj(4,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+  this.images.forEach((im,i)=>obj(5+i,['<< /Type /XObject /Subtype /Image /Width '+im.width+' /Height '+im.height+' /ColorSpace '+(im.comps===1?'/DeviceGray':'/DeviceRGB')+' /BitsPerComponent 8 /Filter /DCTDecode /Length '+im.bytes.length+' >>\nstream\n',im.bytes,'\nendstream']));
+  this.pages.forEach((p,i)=>{
+   const id=first+i*2,xo=p.imgs.map(j=>'/Im'+(j+1)+' '+(5+j)+' 0 R').join(' ');
+   obj(id,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >>'+(xo?' /XObject << '+xo+' >>':'')+' >> /Contents '+(id+1)+' 0 R >>');
+   const c=bin(p.ops.join('\n'));
+   obj(id+1,['<< /Length '+c.length+' >>\nstream\n',c,'\nendstream']);
+  });
+  const infoId=first+this.pages.length*2;
+  obj(infoId,'<< /Title ('+this.esc(this.title)+') /Producer (OrcaFrio) >>');
+  const total=infoId+1,xr=len;
+  let x='xref\n0 '+total+'\n0000000000 65535 f \n';
+  for(let i=1;i<total;i++)x+=String(offs[i]).padStart(10,'0')+' 00000 n \n';
+  push(x+'trailer\n<< /Size '+total+' /Root 1 0 R /Info '+infoId+' 0 R >>\nstartxref\n'+xr+'\n%%EOF');
+  const out=new Uint8Array(len);let o=0;for(const p of parts){out.set(p,o);o+=p.length}
+  return out;
+ }
+}
+function parseJpeg(u8){
+ let i=2;
+ while(i<u8.length){
+  if(u8[i]!==255){i++;continue}
+  const m=u8[i+1];
+  if(m>=0xC0&&m<=0xCF&&m!==0xC4&&m!==0xC8&&m!==0xCC)return{height:(u8[i+5]<<8)|u8[i+6],width:(u8[i+7]<<8)|u8[i+8],comps:u8[i+9]};
+  i+=2+((u8[i+2]<<8)|u8[i+3]);
+ }
+ throw new Error('jpeg');
+}
+</script>
+<script>
+(()=>{'use strict';
+const KEY='orcafrio.pro.v2';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const uid=()=>Math.random().toString(36).slice(2,10);
+const pad=(n,l=4)=>String(n).padStart(l,'0');
+const localISO=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const today=()=>localISO(new Date());
+const addDays=(iso,n)=>{const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return localISO(d)};
+const money=n=>(Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}).replace(/ /g,' ');
+const fq=n=>Number(n||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
+const date=s=>s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const byDateDesc=(a,b)=>(b.data||'').localeCompare(a.data||'');
+const fmtBtu=n=>Number(n)?fq(n)+' BTU/h':'—';
+
+const FREQ=['Mensal','Bimestral','Trimestral','Semestral','Anual'];
+const PERIODOS=[...FREQ,'Personalizada'];
+const PER={Mensal:30,Bimestral:60,Trimestral:90,Semestral:180,Anual:365,Personalizada:30};
+const MONTHS={Mensal:1,Bimestral:2,Trimestral:3,Semestral:6,Anual:12,Personalizada:1};
+const DEF_TASKS=[['Limpeza dos filtros de ar','Mensal'],['Medição da tensão elétrica','Mensal'],['Limpeza da bandeja e verificação do dreno','Mensal'],['Substituição de filtros descartáveis','Trimestral'],['Verificação de superaquecimento','Trimestral'],['Limpeza da serpentina','Semestral'],['Verificação do nível de gás refrigerante','Semestral']];
+const DEF_SERVICES=[
+ ['Instalação de split até 12.000 BTU/h (mão de obra)','un',450],['Instalação de split de 18.000 a 24.000 BTU/h (mão de obra)','un',650],
+ ['Higienização de split até 12.000 BTU/h','un',180],['Higienização de split de 18.000 BTU/h ou mais','un',250],
+ ['Manutenção preventiva (PMOC) por equipamento','un',220],['Carga de gás R-410A','kg',180],['Carga de gás R-32','kg',220],
+ ['Tubulação de cobre com isolamento','m',85],['Suporte de condensadora','un',90],['Desinstalação de split','un',200],['Visita técnica e diagnóstico','visita',120]];
+
+/* ---------- dados ---------- */
+const blank=()=>({empresa:{nome:'',documento:'',telefone:'',email:'',endereco:'',responsavel:'',rtCons:'CFT',rtReg:'',pix:'',validadeDias:15,garantia:'',pagamento:'',logo:''},clientes:[],equipamentos:[],servicos:[],orcamentos:[],pmocs:[],historico:[],seq:{orc:0,pmoc:0},meta:{lastBackup:''}});
+function merge(x){
+ const b=blank(),d={...b,...x,empresa:{...b.empresa,...(x.empresa||{})},seq:{...b.seq,...(x.seq||{})},meta:{...b.meta,...(x.meta||{})}};
+ ['clientes','equipamentos','servicos','orcamentos','pmocs','historico'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[]});
+ return d;
+}
+function norm(d){
+ d.equipamentos.forEach(e=>{
+  if(e.btus==null){const m=String(e.capacidade||'').match(/([\d.]+)\s*btu/i);e.btus=m?Number(m[1].replace(/\./g,''))||0:0}
+  if(e.ocup==null)e.ocup=0;
+ });
+ d.servicos.forEach(s=>{if(!s.un)s.un='un'});
+ let maxO=d.seq.orc||0;
+ d.orcamentos.forEach(q=>{
+  (q.itens||[]).forEach(i=>{if(!i.un)i.un='un'});
+  if(q.garantia==null)q.garantia='';if(q.pagamento==null)q.pagamento='';
+  const m=/^ORC-(\d+)$/.exec(q.numero||'');if(m)maxO=Math.max(maxO,Number(m[1]));
+ });
+ d.seq.orc=maxO;
+ let maxP=d.seq.pmoc||0;
+ d.pmocs.forEach(p=>{const m=/^PMOC-(\d+)$/.exec(p.numero||'');if(m)maxP=Math.max(maxP,Number(m[1]))});
+ d.seq.pmoc=maxP;
+ d.pmocs.forEach(p=>{
+  if(!p.numero){d.seq.pmoc++;p.numero='PMOC-'+pad(d.seq.pmoc)}
+  if(!Array.isArray(p.equipIds))p.equipIds=[];
+  if(!Array.isArray(p.tarefas)||!p.tarefas.length)p.tarefas=DEF_TASKS.map(t=>({desc:t[0],freq:t[1]}));
+  p.periodo=PERIODOS.find(x=>x.toLowerCase()===String(p.periodo||'').toLowerCase())||'Mensal';
+  if(!p.criado)p.criado=p.ultima||today();
+  if(p.rtNome==null)p.rtNome=p.tecnico||d.empresa.responsavel||'';
+  if(p.rtCons==null)p.rtCons=d.empresa.rtCons||'CFT';
+  if(p.rtReg==null)p.rtReg=d.empresa.rtReg||'';
+  if(p.rtTipo==null)p.rtTipo='TRT';
+  if(p.rtNum==null)p.rtNum='';
+  if(p.contato==null)p.contato='';
+ });
+ return d;
+}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));return norm(x&&typeof x==='object'?merge(x):blank())}catch{return norm(blank())}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(e){notify('Não foi possível salvar. Exporte um backup e libere espaço.');return false}}
+let db=load(),page='dashboard',query='',qf='todos',hf={};
+
+const client=id=>db.clientes.find(x=>x.id===id);
+const equipmentBy=id=>db.equipamentos.find(x=>x.id===id);
+const subtotal=q=>(q.itens||[]).reduce((s,i)=>s+(Number(i.qtd)||0)*(Number(i.valor)||0),0);
+const total=q=>Math.max(0,subtotal(q)-(Number(q.desconto)||0));
+const nextFrom=(base,periodo)=>addDays(base||today(),PER[periodo]||30);
+
+/* ---------- interface básica ---------- */
+function notify(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(notify.t);notify.t=setTimeout(()=>el.classList.remove('show'),3200)}
+let modalActs=[];
+function fixLabels(root){(root||document).querySelectorAll('.field').forEach(f=>{const l=f.querySelector('label'),c=f.querySelector('input,select,textarea');if(l&&c&&c.id&&!l.htmlFor)l.htmlFor=c.id})}
+function modal(o){
+ $('#modaltitle').textContent=o.title;$('#modalbody').innerHTML=o.body;
+ $('.modal').classList.toggle('wide',!!o.wide);
+ modalActs=o.actions||[];
+ const cancel=o.cancel===undefined?'Cancelar':o.cancel;
+ $('#modalfoot').innerHTML=(cancel?'<button class="btn" data-ma="cancel">'+cancel+'</button>':'')+modalActs.map((a,i)=>'<button class="btn '+(a.cls||'')+'" data-ma="'+i+'">'+a.label+'</button>').join('');
+ $('#modalback').classList.add('show');$('.modal').scrollTop=0;
+ fixLabels($('#modalbody'));
+ if(o.onOpen)o.onOpen();
+}
+function closeModal(){$('#modalback').classList.remove('show')}
+$('#modalx').onclick=closeModal;
+$('#modalback').addEventListener('mousedown',e=>{if(e.target.id==='modalback')closeModal()});
+$('#modalfoot').addEventListener('click',e=>{const b=e.target.closest('[data-ma]');if(!b)return;if(b.dataset.ma==='cancel')return closeModal();const a=modalActs[+b.dataset.ma];if(a&&a.fn)a.fn()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+function confirmBox(msg,label,fn){modal({title:'Confirmar',body:'<p style="margin:0;line-height:1.6">'+msg+'</p>',actions:[{label,cls:'danger',fn:()=>{closeModal();fn()}}]})}
+
+function fi(label,id,value,attrs,span2){return '<div class="field'+(span2?' span2':'')+'"><label>'+label+'</label><input id="'+id+'" value="'+esc(value)+'" '+(attrs||'')+'></div>'}
+function fs(label,id,options,value,span2){return '<div class="field'+(span2?' span2':'')+'"><label>'+label+'</label><select id="'+id+'">'+options.map(o=>{const v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;return '<option value="'+esc(v)+'"'+(v===value?' selected':'')+'>'+esc(l)+'</option>'}).join('')+'</select></div>'}
+function ft(label,id,value,span2,attrs){return '<div class="field'+(span2?' span2':'')+'"><label>'+label+'</label><textarea id="'+id+'" '+(attrs||'')+'>'+esc(value)+'</textarea></div>'}
+function head(kicker,title,sub,actions){return '<div class="pagehead"><div><div class="eyebrow">'+kicker+'</div><h1>'+title+'</h1><div class="sub">'+sub+'</div></div><div class="actions">'+(actions||'')+'</div></div>'}
+function btn(label,action,cls,id){return '<button class="btn '+(cls||'')+'" data-action="'+action+'"'+(id?' data-id="'+id+'"':'')+'>'+label+'</button>'}
+function cardTable(headers,rows,empty,hint){return '<div class="card"><div class="tablewrap"><table><thead><tr>'+headers.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+(rows||'<tr><td colspan="'+headers.length+'"><div class="empty"><b>'+(empty||'Nenhum registro por aqui ainda.')+'</b>'+(hint||'Cadastre um novo item para começar.')+'</div></td></tr>')+'</tbody></table></div></div>'}
+function tag(cls,label){return '<span class="tag '+cls+'">'+esc(label)+'</span>'}
+const QLABEL={rascunho:'Rascunho',enviado:'Enviado',aprovado:'Aprovado',recusado:'Recusado'};
+const qtag=s=>tag(s,QLABEL[s]||s);
+function pmocState(p){if(!p.proxima)return tag('programado','Sem data');if(p.proxima<today())return tag('vencido','Vencido');if(p.proxima<=addDays(today(),7))return tag('pendente','Em breve');return tag('ativo','Em dia')}
+
+const TITLES={dashboard:'Visão geral',orcamentos:'Orçamentos',clientes:'Clientes',equipamentos:'Equipamentos',servicos:'Serviços',pmoc:'PMOC',historico:'Histórico',empresa:'Minha empresa',dados:'Backup e dados'};
+function nav(p,keep){
+ if(p==='mais')return openMore();
+ page=p;query='';if(!keep)hf={};
+ $$('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
+ $('#crumb').textContent=TITLES[p]||p;render();window.scrollTo(0,0);
+}
+const go=(p,f)=>{hf=f||{};nav(p,true)};
+$$('[data-page]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.page)));
+function render(){
+ const f={dashboard,orcamentos:quotes,clientes:clients,equipamentos:equipment,servicos:services,pmoc,historico:history,empresa:company,dados:backup}[page]||dashboard;
+ $('#app').innerHTML=f();fixLabels($('#app'));
+ const n=(db.empresa.nome||'OF').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();$('#avatar').textContent=n||'OF';
+}
+function openMore(){modal({title:'Mais opções',cancel:'Fechar',body:'<div class="grid">'+[['Serviços','servicos'],['Histórico técnico','historico'],['Minha empresa','empresa'],['Backup e dados','dados']].map(x=>'<button class="btn" data-goto="'+x[1]+'" style="justify-content:flex-start">'+x[0]+' →</button>').join('')+'</div>',onOpen:()=>$$('[data-goto]').forEach(b=>b.onclick=()=>{closeModal();nav(b.dataset.goto)})})}
+
+/* ---------- páginas ---------- */
+function dashboard(){
+ const q=db.orcamentos,open=q.filter(x=>['rascunho','enviado'].includes(x.status)),appr=q.filter(x=>x.status==='aprovado');
+ const apprVal=appr.reduce((s,x)=>s+total(x),0),late=db.pmocs.filter(p=>p.proxima&&p.proxima<today()).length;
+ const upcoming=[...db.pmocs].filter(p=>p.proxima).sort((a,b)=>a.proxima.localeCompare(b.proxima)).slice(0,5);
+ const recent=[...q].sort(byDateDesc).slice(0,6);
+ const hasData=db.clientes.length||q.length||db.pmocs.length||db.equipamentos.length;
+ const days=db.meta.lastBackup?Math.floor((Date.now()-new Date(db.meta.lastBackup))/864e5):null;
+ const nudge=hasData&&(days===null||days>=30)?'<div class="sectionnote warn">'+(days===null?'Você ainda não fez nenhum backup.':'Seu último backup foi há '+days+' dias.')+' Seus dados ficam só neste aparelho. <button class="btn small" data-action="export-backup" style="margin-left:6px">Fazer backup agora</button></div>':'';
+ const noco=!db.empresa.nome?'<div class="sectionnote">Comece preenchendo os dados e a logo da sua empresa. Eles saem no topo de todo orçamento e PMOC. <button class="btn small" data-action="goto-company" style="margin-left:6px">Abrir Minha empresa</button></div>':'';
+ return head('PAINEL DE CONTROLE','Visão geral','Acompanhe seus orçamentos, clientes e manutenções.',btn('+ Novo orçamento','new-quote','primary'))+noco+nudge+
+ '<div class="grid stats">'+
+ '<div class="card stat"><div><div class="label">Orçamentos</div><div class="value">'+q.length+'</div><div class="hint">'+open.length+' em andamento</div></div><div class="symbol">▤</div></div>'+
+ '<div class="card stat"><div><div class="label">Aprovados</div><div class="value">'+appr.length+'</div><div class="hint">Total '+money(apprVal)+'</div></div><div class="symbol">✓</div></div>'+
+ '<div class="card stat"><div><div class="label">Clientes</div><div class="value">'+db.clientes.length+'</div><div class="hint">'+db.equipamentos.length+' equipamentos</div></div><div class="symbol">♙</div></div>'+
+ '<div class="card stat"><div><div class="label">PMOCs vencidos</div><div class="value">'+late+'</div><div class="hint">Precisam de atenção</div></div><div class="symbol">◷</div></div></div>'+
+ '<div class="grid cols"><div class="card"><div class="cardhead"><h3>Orçamentos recentes</h3><button class="btn small" data-action="goto-quotes">Ver todos →</button></div>'+
+ (recent.length?'<div class="tablewrap"><table><thead><tr><th>Nº</th><th>Cliente</th><th>Data</th><th>Valor</th><th>Status</th></tr></thead><tbody>'+recent.map(x=>'<tr><td><b>'+esc(x.numero)+'</b></td><td>'+esc(x.clienteNome)+'</td><td>'+date(x.data)+'</td><td><b>'+money(total(x))+'</b></td><td>'+qtag(x.status)+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty"><b>Seu painel está pronto.</b>Crie seu primeiro orçamento para começar.</div>')+'</div>'+
+ '<div class="card"><div class="cardhead"><h3>Próximas manutenções</h3><button class="btn small" data-action="goto-pmoc">Ver PMOC →</button></div>'+
+ (upcoming.length?upcoming.map(p=>'<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #edf1f5"><div style="min-width:0"><b>'+esc(p.titulo)+'</b><div class="muted" style="font-size:11px">'+esc(client(p.clienteId)?.nome||'—')+' · '+date(p.proxima)+'</div></div>'+pmocState(p)+'</div>').join(''):'<div class="empty"><b>Nenhum plano ainda.</b>Crie um plano PMOC para acompanhar as datas.</div>')+
+ '<div class="grid" style="grid-template-columns:1fr 1fr;margin-top:15px">'+[['＋','Novo orçamento','new-quote'],['♙','Novo cliente','new-client'],['❄','Equipamento','new-equipment'],['▣','Plano PMOC','new-pmoc']].map(x=>'<button class="btn" style="justify-content:flex-start;padding:13px 10px" data-action="'+x[2]+'"><span style="font-size:18px">'+x[0]+'</span>'+x[1]+'</button>').join('')+'</div></div></div>';
+}
+function quotes(){
+ const list=db.orcamentos.filter(x=>(x.clienteNome+' '+x.numero+' '+x.status).toLowerCase().includes(query.toLowerCase())&&(qf==='todos'||x.status===qf)).sort(byDateDesc);
+ return head('COMERCIAL','Orçamentos','Crie propostas, acompanhe aprovações e gere documentos.',btn('+ Novo orçamento','new-quote','primary'))+
+ '<div class="toolbar"><input class="search" id="search" style="flex:1;min-width:200px" placeholder="Buscar por cliente, número ou status..." value="'+esc(query)+'"><select id="qfilter" aria-label="Filtrar por status"><option value="todos">Todos os status</option>'+Object.keys(QLABEL).map(k=>'<option value="'+k+'"'+(qf===k?' selected':'')+'>'+QLABEL[k]+'</option>').join('')+'</select></div>'+
+ cardTable(['Número','Cliente','Data','Validade','Valor','Status','Ações'],list.map(q=>'<tr><td><b>'+esc(q.numero)+'</b></td><td>'+esc(q.clienteNome)+'</td><td>'+date(q.data)+'</td><td>'+date(q.validade)+'</td><td><b>'+money(total(q))+'</b></td><td>'+qtag(q.status)+'</td><td><div class="inline-actions"><button class="btn small" data-action="view-quote" data-id="'+q.id+'">Abrir</button><button class="btn small" data-action="edit-quote" data-id="'+q.id+'">Editar</button><button class="btn small danger" data-action="del-quote" data-id="'+q.id+'">Excluir</button></div></td></tr>').join(''),'Nenhum orçamento encontrado.');
+}
+function clients(){
+ const list=db.clientes.filter(x=>(x.nome+' '+x.telefone+' '+x.documento).toLowerCase().includes(query.toLowerCase()));
+ return head('RELACIONAMENTO','Clientes','Centralize contatos e mantenha os dados dos seus clientes.',btn('+ Novo cliente','new-client','primary'))+
+ '<div class="toolbar"><input class="search" id="search" placeholder="Buscar cliente..." value="'+esc(query)+'"></div>'+
+ cardTable(['Cliente','Telefone','Documento','Equipamentos','Ações'],list.map(c=>'<tr><td><b>'+esc(c.nome)+'</b><div class="muted">'+esc(c.email||'')+'</div></td><td>'+esc(c.telefone||'—')+'</td><td>'+esc(c.documento||'—')+'</td><td>'+db.equipamentos.filter(e=>e.clienteId===c.id).length+'</td><td><div class="inline-actions"><button class="btn small" data-action="edit-client" data-id="'+c.id+'">Editar</button><button class="btn small" data-action="client-history" data-id="'+c.id+'">Histórico</button><button class="btn small danger" data-action="del-client" data-id="'+c.id+'">Excluir</button></div></td></tr>').join(''),'Nenhum cliente cadastrado.');
+}
+function equipment(){
+ const list=db.equipamentos.filter(x=>(x.nome+' '+x.marca+' '+x.modelo+' '+(client(x.clienteId)?.nome||'')).toLowerCase().includes(query.toLowerCase()));
+ return head('BASE TÉCNICA','Equipamentos','Vincule máquinas aos clientes e acompanhe dados de manutenção.',btn('+ Novo equipamento','new-equipment','primary'))+
+ '<div class="toolbar"><input class="search" id="search" placeholder="Buscar equipamento ou cliente..." value="'+esc(query)+'"></div>'+
+ cardTable(['Equipamento','Cliente','Marca / modelo','Capacidade','Instalação','Ações'],list.map(e=>'<tr><td><b>'+esc(e.nome)+'</b><div class="muted">'+esc([e.tipo,e.local].filter(Boolean).join(' · '))+'</div></td><td>'+esc(client(e.clienteId)?.nome||'Cliente removido')+'</td><td>'+esc([e.marca,e.modelo].filter(Boolean).join(' / ')||'—')+'</td><td>'+(e.btus?fmtBtu(e.btus):esc(e.capacidade||'—'))+'</td><td>'+date(e.instalacao)+'</td><td><div class="inline-actions"><button class="btn small" data-action="edit-equipment" data-id="'+e.id+'">Editar</button><button class="btn small" data-action="equipment-history" data-id="'+e.id+'">Histórico</button><button class="btn small danger" data-action="del-equipment" data-id="'+e.id+'">Excluir</button></div></td></tr>').join(''),'Nenhum equipamento cadastrado.');
+}
+function services(){
+ return head('CATÁLOGO','Serviços','Monte uma lista padrão para acelerar a criação de orçamentos.',btn('Carregar modelo de refrigeração','load-services')+btn('+ Novo serviço','new-service','primary'))+
+ (db.servicos.length?'':'<div class="sectionnote">Quer ganhar tempo? "Carregar modelo de refrigeração" adiciona serviços comuns de ar-condicionado. Os preços são só exemplos, ajuste para a sua tabela.</div>')+
+ cardTable(['Serviço','Descrição','Unidade','Preço sugerido','Ações'],db.servicos.map(s=>'<tr><td><b>'+esc(s.nome)+'</b></td><td>'+esc(s.descricao||'—')+'</td><td>'+esc(s.un||'un')+'</td><td>'+money(s.valor)+'</td><td><div class="inline-actions"><button class="btn small" data-action="edit-service" data-id="'+s.id+'">Editar</button><button class="btn small danger" data-action="del-service" data-id="'+s.id+'">Excluir</button></div></td></tr>').join(''),'Seu catálogo está vazio.');
+}
+function pmoc(){
+ const list=db.pmocs.filter(x=>(x.titulo+' '+x.numero+' '+(client(x.clienteId)?.nome||'')).toLowerCase().includes(query.toLowerCase())).sort((a,b)=>(a.proxima||'9999').localeCompare(b.proxima||'9999'));
+ return head('MANUTENÇÃO','Planos PMOC','Monte o plano, registre cada manutenção e gere o documento em PDF.',btn('+ Novo plano','new-pmoc','primary'))+
+ '<div class="sectionnote">Este módulo organiza o plano, o inventário e os registros de manutenção. A documentação técnica, a responsabilidade profissional (TRT ou ART) e a conformidade legal devem ser validadas pelo responsável técnico habilitado, conforme as normas aplicáveis.</div>'+
+ '<div class="toolbar"><input class="search" id="search" placeholder="Buscar plano ou cliente..." value="'+esc(query)+'"></div>'+
+ cardTable(['Plano','Cliente','Equipamentos','Periodicidade','Última','Próxima','Status','Ações'],list.map(p=>'<tr><td><b>'+esc(p.titulo)+'</b><div class="muted">'+esc(p.numero)+(p.ambiente?' · '+esc(p.ambiente):'')+'</div></td><td>'+esc(client(p.clienteId)?.nome||'—')+'</td><td>'+pmocEquips(p).length+'<div class="muted">'+fmtBtu(btuSum(p))+'</div></td><td>'+esc(p.periodo)+'</td><td>'+date(p.ultima)+'</td><td>'+date(p.proxima)+'</td><td>'+pmocState(p)+'</td><td><div class="inline-actions"><button class="btn small" data-action="view-pmoc" data-id="'+p.id+'">Abrir</button><button class="btn small" data-action="pmoc-record" data-id="'+p.id+'">Registrar</button><button class="btn small" data-action="edit-pmoc" data-id="'+p.id+'">Editar</button><button class="btn small danger" data-action="del-pmoc" data-id="'+p.id+'">Excluir</button></div></td></tr>').join(''),'Nenhum plano PMOC cadastrado.','Cadastre os equipamentos do cliente e crie o primeiro plano.');
+}
+function history(){
+ let list=db.historico.filter(h=>(!hf.clienteId||h.clienteId===hf.clienteId)&&(!hf.equipId||h.equipamentoId===hf.equipId||(!h.equipamentoId&&h.pmocId&&((db.pmocs.find(p=>p.id===h.pmocId)||{}).equipIds||[]).includes(hf.equipId)))).sort(byDateDesc);
+ let chip='';
+ if(hf.clienteId)chip='Cliente: '+esc(client(hf.clienteId)?.nome||'—');
+ if(hf.equipId)chip='Equipamento: '+esc(equipmentBy(hf.equipId)?.nome||'—');
+ return head('REGISTROS','Histórico técnico','Serviços e intervenções registrados por cliente e equipamento.')+
+ (chip?'<div class="filterchip">'+chip+' <button data-action="clear-filter" aria-label="Limpar filtro">✕</button></div>':'')+
+ cardTable(['Data','Cliente','Equipamento','Atividade','Técnico','Detalhes',''],list.map(h=>'<tr><td>'+date(h.data)+'</td><td>'+esc(client(h.clienteId)?.nome||h.clienteNome||'—')+'</td><td>'+esc(h.equipamentoId?(equipmentBy(h.equipamentoId)?.nome||'—'):(h.pmocId?'Todos do plano':'—'))+'</td><td><b>'+esc(h.titulo)+'</b>'+((h.feitas&&h.feitas.length)?'<div class="muted">'+esc(h.feitas.join('; '))+'</div>':'')+'</td><td>'+esc(h.tecnico||'—')+'</td><td>'+esc([h.obs,h.pecas&&'Peças: '+h.pecas,h.nc&&'Não conformidades: '+h.nc].filter(Boolean).join(' | ')||'—')+'</td><td><button class="btn small danger" data-action="del-history" data-id="'+h.id+'" aria-label="Excluir registro">Excluir</button></td></tr>').join(''),'Nenhuma atividade registrada.','Os registros aparecem aqui quando você registra uma manutenção.');
+}
+function company(){
+ const e=db.empresa;
+ return head('CONFIGURAÇÕES','Minha empresa','Estes dados e a logo aparecem nos orçamentos e nos PMOCs.',btn('Salvar dados','save-company','primary'))+
+ '<div class="card"><div class="formgrid">'+
+ fi('Nome / razão social','co-nome',e.nome)+fi('CPF / CNPJ','co-doc',e.documento)+
+ fi('Telefone / WhatsApp','co-tel',e.telefone,'inputmode="tel"')+fi('E-mail','co-email',e.email,'type="email"')+
+ fi('Endereço','co-end',e.endereco,'',true)+
+ '</div><h4 class="formh">Condições padrão dos orçamentos</h4><div class="formgrid">'+
+ fi('Chave Pix','co-pix',e.pix)+fi('Validade padrão (dias)','co-val',e.validadeDias,'type="number" min="1" inputmode="numeric"')+
+ ft('Garantia padrão','co-gar',e.garantia,true,'placeholder="Ex.: 90 dias sobre o serviço executado"')+
+ ft('Forma de pagamento padrão','co-pag',e.pagamento,true,'placeholder="Ex.: 50% na aprovação e 50% na conclusão"')+
+ '</div><h4 class="formh">Responsável técnico (usado nos PMOCs)</h4><div class="formgrid">'+
+ fi('Nome do responsável técnico','co-resp',e.responsavel,'',true)+fs('Conselho','co-cons',['CFT','CREA'],e.rtCons)+fi('Nº de registro','co-reg',e.rtReg)+
+ '</div><h4 class="formh">Logotipo</h4><div class="field"><label>Imagem PNG, JPG ou WebP (aparece no topo dos documentos)</label><input id="co-logo" type="file" accept="image/png,image/jpeg,image/webp"></div>'+
+ (e.logo?'<img class="logo-preview" src="'+e.logo+'" alt="Logo"> <button class="btn small danger" data-action="remove-logo">Remover logo</button>':'')+'</div>';
+}
+function backup(){
+ const last=db.meta.lastBackup?new Date(db.meta.lastBackup).toLocaleString('pt-BR'):'nunca';
+ return head('SEGURANÇA','Backup e dados','Exporte uma cópia dos seus dados ou restaure um backup anterior.')+
+ '<div class="grid cols"><div class="card"><div class="cardhead"><h3>Exportar backup</h3></div><p class="muted">Baixe todos os cadastros, orçamentos, equipamentos, planos e histórico em um arquivo. Último backup: <b>'+last+'</b>.</p><div class="actions">'+btn('↓ Baixar backup','export-backup','primary')+btn('Copiar texto do backup','copy-backup')+'</div></div>'+
+ '<div class="card"><div class="cardhead"><h3>Restaurar backup</h3></div><p class="muted">A restauração substitui os dados atuais. Exporte uma cópia antes de continuar.</p><div class="field"><label>Arquivo de backup</label><input type="file" id="backupfile" accept=".json,application/json"></div>'+btn('Restaurar do arquivo','import-backup')+'<div class="field" style="margin-top:14px"><label>Ou cole aqui o texto do backup</label><textarea id="backuptext" placeholder="Cole o texto copiado"></textarea></div>'+btn('Restaurar do texto','import-paste')+'</div></div>'+
+ '<div class="sectionnote" style="margin-top:16px">Importante: esta versão guarda os dados neste aparelho e navegador. Limpar os dados do navegador pode apagar seus registros. Faça backups regulares.</div>'+
+ '<div class="card"><h3>Resumo do armazenamento</h3><div class="detailgrid">'+[['Clientes',db.clientes.length],['Orçamentos',db.orcamentos.length],['Equipamentos',db.equipamentos.length],['Planos PMOC',db.pmocs.length],['Histórico',db.historico.length]].map(x=>'<div class="detailbox"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join('')+'</div></div>';
+}
+
+/* ---------- ações ---------- */
+const $app=$('#app');
+$app.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b)act(b.dataset.action,b.dataset.id)});
+$app.addEventListener('input',e=>{if(e.target.id==='search'){query=e.target.value;const pos=e.target.selectionStart;render();const n=$('#search');n.focus();n.setSelectionRange(pos,pos)}});
+$app.addEventListener('change',e=>{
+ const t=e.target;
+ if(t.id==='qfilter'){qf=t.value;render();return}
+ if(t.id==='co-logo'){logoUpload(t.files[0]);return}
+ if(t.id&&t.id.startsWith('co-')){collectCompany();persist()}
+});
+function act(a,id){
+ switch(a){
+ case 'goto-quotes':return nav('orcamentos');
+ case 'goto-pmoc':return nav('pmoc');
+ case 'goto-company':return nav('empresa');
+ case 'new-quote':return quoteForm();
+ case 'edit-quote':return quoteForm(db.orcamentos.find(x=>x.id===id));
+ case 'view-quote':return viewQuote(db.orcamentos.find(x=>x.id===id));
+ case 'del-quote':return delQuote(db.orcamentos.find(x=>x.id===id));
+ case 'new-client':return clientForm();
+ case 'edit-client':return clientForm(client(id));
+ case 'del-client':return delClient(client(id));
+ case 'client-history':return go('historico',{clienteId:id});
+ case 'new-equipment':return equipmentForm();
+ case 'edit-equipment':return equipmentForm(equipmentBy(id));
+ case 'del-equipment':return delEquipment(equipmentBy(id));
+ case 'equipment-history':return go('historico',{equipId:id});
+ case 'new-service':return serviceForm();
+ case 'edit-service':return serviceForm(db.servicos.find(x=>x.id===id));
+ case 'del-service':return confirmBox('Excluir este serviço do catálogo? Orçamentos já feitos não mudam.','Excluir',()=>{db.servicos=db.servicos.filter(x=>x.id!==id);persist();render();notify('Serviço excluído.')});
+ case 'load-services':return loadServices();
+ case 'new-pmoc':return pmocForm();
+ case 'edit-pmoc':return pmocForm(db.pmocs.find(x=>x.id===id));
+ case 'view-pmoc':return viewPmoc(db.pmocs.find(x=>x.id===id));
+ case 'del-pmoc':return delPmoc(db.pmocs.find(x=>x.id===id));
+ case 'pmoc-record':return recordForm(db.pmocs.find(x=>x.id===id));
+ case 'del-history':return delHistory(db.historico.find(x=>x.id===id));
+ case 'clear-filter':hf={};return render();
+ case 'save-company':collectCompany();if(persist()){render();notify('Dados da empresa salvos!')}return;
+ case 'remove-logo':db.empresa.logo='';persist();render();return;
+ case 'export-backup':return exportBackup();
+ case 'copy-backup':return copyText(JSON.stringify(db),'Backup copiado. Cole e guarde em um lugar seguro.');
+ case 'import-backup':return importFile();
+ case 'import-paste':return restoreFrom($('#backuptext').value);
+ }
+}
+
+/* ----- clientes ----- */
+function clientForm(c){
+ const v=c||{};
+ modal({title:c?'Editar cliente':'Novo cliente',body:'<div class="formgrid">'+fi('Nome / razão social *','f-nome',v.nome,'',true)+fi('Telefone / WhatsApp','f-tel',v.telefone,'inputmode="tel"')+fi('CPF / CNPJ','f-doc',v.documento)+fi('E-mail','f-email',v.email,'type="email"')+fi('CEP','f-cep',v.cep,'inputmode="numeric"')+fi('Endereço','f-end',v.endereco,'',true)+ft('Observações','f-obs',v.obs,true)+'</div>',
+ actions:[{label:'Salvar cliente',cls:'primary',fn:()=>{
+  const nome=$('#f-nome').value.trim();if(!nome)return notify('Informe o nome do cliente.');
+  const x={id:v.id||uid(),nome,telefone:$('#f-tel').value.trim(),documento:$('#f-doc').value.trim(),email:$('#f-email').value.trim(),cep:$('#f-cep').value.trim(),endereco:$('#f-end').value.trim(),obs:$('#f-obs').value.trim()};
+  if(c)Object.assign(c,x);else db.clientes.push(x);
+  if(persist()){closeModal();render();notify('Cliente salvo!')}}}]});
+}
+function delClient(c){
+ if(!c)return;
+ const eq=db.equipamentos.filter(e=>e.clienteId===c.id).length,pl=db.pmocs.filter(p=>p.clienteId===c.id).length;
+ if(eq||pl)return modal({title:'Não dá para excluir ainda',cancel:'Entendi',body:'<p style="margin:0;line-height:1.6"><b>'+esc(c.nome)+'</b> ainda tem '+(eq?eq+' equipamento(s)':'')+(eq&&pl?' e ':'')+(pl?pl+' plano(s) PMOC':'')+'. Exclua esses itens primeiro. Assim você não perde o histórico técnico sem querer.</p>'});
+ const oq=db.orcamentos.filter(q=>q.clienteId===c.id).length;
+ confirmBox('Excluir o cliente <b>'+esc(c.nome)+'</b>?'+(oq?' Os '+oq+' orçamento(s) dele continuam salvos com o nome.':''),'Excluir cliente',()=>{
+  db.orcamentos.forEach(q=>{if(q.clienteId===c.id)q.clienteId=''});
+  db.clientes=db.clientes.filter(x=>x.id!==c.id);persist();render();notify('Cliente excluído.')});
+}
+
+/* ----- equipamentos ----- */
+function equipmentForm(e){
+ const v=e||{},opts=db.clientes.map(c=>[c.id,c.nome]);
+ if(!db.clientes.length)return modal({title:'Cadastre um cliente primeiro',cancel:'Fechar',body:'<p style="margin:0;line-height:1.6">Todo equipamento fica ligado a um cliente. Cadastre o cliente e volte aqui.</p>',actions:[{label:'Novo cliente',cls:'primary',fn:()=>clientForm()}]});
+ modal({title:e?'Editar equipamento':'Novo equipamento',body:'<div class="formgrid">'+
+ fs('Cliente *','f-cliente',[['','Selecione'],...opts],v.clienteId||'',true)+
+ fi('Identificação / nome *','f-nome',v.nome,'placeholder="Ex.: Ar-condicionado recepção"')+
+ fs('Tipo','f-tipo',['Split','Janela','Cassete','Piso-teto','Chiller','Câmara fria','Geladeira','Outro'],v.tipo||'Split')+
+ fi('Marca','f-marca',v.marca)+fi('Modelo','f-modelo',v.modelo)+
+ fi('Capacidade (BTU/h)','f-btus',v.btus||'','type="number" min="0" step="1" inputmode="numeric" placeholder="Ex.: 12000"')+
+ fi('Ocupantes do ambiente','f-ocup',v.ocup||'','type="number" min="0" step="1" inputmode="numeric"')+
+ fi('Nº de série / patrimônio','f-serie',v.serie)+fi('Local / ambiente','f-local',v.local)+
+ fi('Data de instalação','f-data',v.instalacao,'type="date"')+ft('Observações','f-obs',v.obs,true)+'</div>',
+ actions:[{label:'Salvar equipamento',cls:'primary',fn:()=>{
+  const clienteId=$('#f-cliente').value,nome=$('#f-nome').value.trim();
+  if(!clienteId||!nome)return notify('Selecione o cliente e informe a identificação.');
+  const btus=Number($('#f-btus').value)||0,ocup=Number($('#f-ocup').value)||0;
+  if(btus<0||ocup<0)return notify('Capacidade e ocupantes não podem ser negativos.');
+  const x={id:v.id||uid(),clienteId,nome,tipo:$('#f-tipo').value,marca:$('#f-marca').value.trim(),modelo:$('#f-modelo').value.trim(),btus,ocup,serie:$('#f-serie').value.trim(),local:$('#f-local').value.trim(),instalacao:$('#f-data').value,obs:$('#f-obs').value.trim()};
+  if(e)Object.assign(e,x);else db.equipamentos.push(x);
+  if(persist()){closeModal();render();notify('Equipamento salvo!')}}}]});
+}
+function delEquipment(e){
+ if(!e)return;
+ const pl=db.pmocs.filter(p=>p.equipIds.includes(e.id)).length;
+ confirmBox('Excluir <b>'+esc(e.nome)+'</b>?'+(pl?' Ele também sai de '+pl+' plano(s) PMOC.':'')+' Os registros do histórico continuam salvos.','Excluir equipamento',()=>{
+  db.pmocs.forEach(p=>{p.equipIds=p.equipIds.filter(i=>i!==e.id)});
+  db.historico.forEach(h=>{if(h.equipamentoId===e.id)h.equipamentoId=''});
+  db.equipamentos=db.equipamentos.filter(x=>x.id!==e.id);persist();render();notify('Equipamento excluído.')});
+}
+
+/* ----- serviços ----- */
+function serviceForm(s){
+ const v=s||{};
+ modal({title:s?'Editar serviço':'Novo serviço',body:fi('Nome do serviço *','f-nome',v.nome)+ft('Descrição','f-desc',v.descricao)+'<div class="formgrid">'+fi('Unidade','f-un',v.un||'un','placeholder="un, kg, m, visita"')+fi('Preço sugerido (R$)','f-valor',v.valor||0,'type="number" min="0" step="0.01" inputmode="decimal"')+'</div>',
+ actions:[{label:'Salvar serviço',cls:'primary',fn:()=>{
+  const nome=$('#f-nome').value.trim(),valor=Number($('#f-valor').value);
+  if(!nome||!Number.isFinite(valor)||valor<0)return notify('Confira nome e preço.');
+  const x={id:v.id||uid(),nome,descricao:$('#f-desc').value.trim(),un:$('#f-un').value.trim()||'un',valor};
+  if(s)Object.assign(s,x);else db.servicos.push(x);
+  if(persist()){closeModal();render();notify('Serviço salvo!')}}}]});
+}
+function loadServices(){
+ let n=0;DEF_SERVICES.forEach(d=>{if(!db.servicos.some(s=>s.nome===d[0])){db.servicos.push({id:uid(),nome:d[0],descricao:'',un:d[1],valor:d[2]});n++}});
+ if(persist()){render();notify(n?n+' serviços adicionados. Ajuste os preços para a sua tabela.':'Os serviços do modelo já estão na lista.')}
+}
+
+/* ----- orçamentos ----- */
+function quoteForm(q){
+ const e=db.empresa;
+ const v=q||{itens:[{desc:'',qtd:1,un:'un',valor:0}],desconto:0,data:today(),validade:addDays(today(),Number(e.validadeDias)||15),status:'rascunho',garantia:e.garantia,pagamento:e.pagamento,obs:''};
+ const items=(v.itens||[]).map(i=>({...i}));
+ const copts=db.clientes.map(c=>'<option value="'+c.id+'"'+(v.clienteId===c.id?' selected':'')+'>'+esc(c.nome)+'</option>').join('');
+ modal({title:q?'Editar orçamento':'Novo orçamento',wide:true,body:
+ '<div class="formgrid"><div class="field"><label>Cliente cadastrado</label><select id="f-cliente"><option value="">Cliente avulso / selecione</option>'+copts+'</select></div>'+
+ fi('Nome do cliente *','f-nome',v.clienteNome||'')+fi('Telefone / WhatsApp','f-tel',v.telefone||'','inputmode="tel"')+fi('Data','f-data',v.data,'type="date"')+fi('Validade','f-validade',v.validade,'type="date"')+
+ fs('Status','f-status',Object.keys(QLABEL).map(k=>[k,QLABEL[k]]),v.status)+'</div>'+
+ '<div class="field"><label>Adicionar item do catálogo</label><select id="f-catalogo"><option value="">Escolha um serviço para adicionar</option>'+db.servicos.map(s=>'<option value="'+s.id+'">'+esc(s.nome)+' — '+money(s.valor)+'</option>').join('')+'</select></div>'+
+ '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px"><b>Itens do orçamento</b><button class="btn small" type="button" id="additem">+ Item manual</button></div><div id="quoteitems"></div>'+
+ '<div class="field" style="max-width:220px;margin:14px 0 0 auto"><label>Desconto (R$)</label><input id="f-desconto" type="number" min="0" step="0.01" inputmode="decimal" value="'+(Number(v.desconto)||0)+'"></div>'+
+ '<div class="totals" id="quotetotal"></div>'+
+ '<div class="formgrid" style="margin-top:14px">'+ft('Garantia','f-garantia',v.garantia,true)+ft('Forma de pagamento','f-pagamento',v.pagamento,true)+ft('Observações','f-obs',v.obs,true)+'</div>',
+ actions:[{label:'Salvar orçamento',cls:'primary',fn:()=>saveQuote(q,items)}],
+ onOpen:()=>{
+  const draw=()=>{
+   $('#quoteitems').innerHTML=items.map((i,n)=>'<div class="itemrow"><input class="desc" data-i="'+n+'" data-k="desc" placeholder="Descrição do serviço" aria-label="Descrição" value="'+esc(i.desc)+'"><input data-i="'+n+'" data-k="qtd" type="number" min="0" step="any" inputmode="decimal" aria-label="Quantidade" value="'+i.qtd+'"><input data-i="'+n+'" data-k="un" aria-label="Unidade" placeholder="un" value="'+esc(i.un||'')+'"><input data-i="'+n+'" data-k="valor" type="number" min="0" step="any" inputmode="decimal" aria-label="Valor unitário" value="'+i.valor+'"><button class="btn small danger" data-rm="'+n+'" type="button" aria-label="Remover item">×</button></div>').join('')||'<div class="muted" style="padding:8px 0">Nenhum item. Escolha um do catálogo ou adicione um manual.</div>';
+   calc();
+  };
+  const calc=()=>{
+   const sub=items.reduce((s,i)=>s+(Number(i.qtd)||0)*(Number(i.valor)||0),0),d=Number($('#f-desconto').value)||0;
+   $('#quotetotal').innerHTML='<div class="totalrow"><span>Subtotal</span><b>'+money(sub)+'</b></div><div class="totalrow"><span>Desconto</span><b>'+money(d)+'</b></div><div class="totalrow final"><span>Total</span><strong>'+money(Math.max(0,sub-d))+'</strong></div>';
+  };
+  $('#quoteitems').addEventListener('input',e=>{const el=e.target;if(el.dataset.i==null)return;const i=+el.dataset.i,k=el.dataset.k;items[i][k]=(k==='desc'||k==='un')?el.value:Number(el.value);calc()});
+  $('#quoteitems').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(b){items.splice(+b.dataset.rm,1);draw()}});
+  $('#additem').onclick=()=>{items.push({desc:'',qtd:1,un:'un',valor:0});draw()};
+  $('#f-catalogo').onchange=ev=>{const s=db.servicos.find(x=>x.id===ev.target.value);if(s){for(let k=items.length-1;k>=0;k--)if(!String(items[k].desc||'').trim()&&!Number(items[k].valor))items.splice(k,1);items.push({desc:s.nome,qtd:1,un:s.un||'un',valor:s.valor});draw();ev.target.value=''}};
+  $('#f-desconto').oninput=calc;
+  $('#f-cliente').onchange=()=>{const c=client($('#f-cliente').value);if(c){$('#f-nome').value=c.nome;$('#f-tel').value=c.telefone||''}};
+  draw();
+ }});
+}
+function saveQuote(old,items){
+ const nome=$('#f-nome').value.trim(),itens=items.filter(i=>String(i.desc||'').trim()||Number(i.valor)).map(i=>({desc:String(i.desc||'').trim(),qtd:Number(i.qtd),un:String(i.un||'').trim()||'un',valor:Number(i.valor)}));
+ const desconto=Number($('#f-desconto').value)||0,sub=itens.reduce((s,i)=>s+i.qtd*i.valor,0),validade=$('#f-validade').value;
+ if(!nome)return notify('Informe o nome do cliente.');
+ if(!itens.length||itens.some(i=>!i.desc||!Number.isFinite(i.qtd)||i.qtd<=0||!Number.isFinite(i.valor)||i.valor<0))return notify('Confira os itens, quantidades e valores.');
+ if(desconto<0||desconto>sub)return notify('O desconto não pode superar o subtotal.');
+ if(!validade)return notify('Informe a validade do orçamento.');
+ const c=client($('#f-cliente').value);
+ let numero=old&&old.numero;if(!numero){db.seq.orc++;numero='ORC-'+pad(db.seq.orc)}
+ const x={id:old?.id||uid(),numero,clienteId:c?.id||'',clienteNome:c?.nome||nome,telefone:c?.telefone||$('#f-tel').value.trim(),data:$('#f-data').value||today(),validade,status:$('#f-status').value,itens,desconto,garantia:$('#f-garantia').value.trim(),pagamento:$('#f-pagamento').value.trim(),obs:$('#f-obs').value.trim()};
+ if(old)Object.assign(old,x);else db.orcamentos.push(x);
+ if(persist()){const q=old||x;render();notify('Orçamento salvo!');viewQuote(q)}
+}
+function delQuote(q){if(!q)return;confirmBox('Excluir o orçamento <b>'+esc(q.numero)+'</b> de '+esc(q.clienteNome)+'? Essa ação não pode ser desfeita.','Excluir orçamento',()=>{db.orcamentos=db.orcamentos.filter(x=>x.id!==q.id);persist();render();notify('Orçamento excluído.')})}
+function dupQuote(q){
+ db.seq.orc++;const n={...JSON.parse(JSON.stringify(q)),id:uid(),numero:'ORC-'+pad(db.seq.orc),data:today(),validade:addDays(today(),Number(db.empresa.validadeDias)||15),status:'rascunho'};
+ db.orcamentos.push(n);if(persist()){render();notify('Cópia criada como rascunho.');viewQuote(n)}
+}
+function companyHead(right){
+ const e=db.empresa;
+ return '<div class="dochead"><div class="dochead-l">'+(e.logo?'<img class="doclogo" src="'+e.logo+'" alt="Logo">':'')+'<div><div class="docco">'+esc(e.nome||'Nome da sua empresa')+'</div><div class="docsm">'+(([e.documento,e.telefone,e.email].filter(Boolean).map(esc).join(' · '))||'Preencha os dados em Minha empresa')+'</div>'+(e.endereco?'<div class="docsm">'+esc(e.endereco)+'</div>':'')+'</div></div><div class="dochead-r">'+right+'</div></div>';
+}
+function quoteDoc(q){
+ const e=db.empresa,sub=subtotal(q);
+ const cond=[['Validade','Até '+date(q.validade)],['Garantia',q.garantia],['Forma de pagamento',q.pagamento],['Chave Pix',e.pix],['Observações',q.obs]].filter(x=>x[1]);
+ return '<div class="doc" id="quotedoc">'+companyHead('<div class="doctitle">ORÇAMENTO</div><b>'+esc(q.numero)+'</b><div class="docsm">Emissão: '+date(q.data)+'</div><div class="docsm">Validade: '+date(q.validade)+'</div>')+
+ '<div class="docgrid"><div><small class="lb">Cliente</small><b>'+esc(q.clienteNome)+'</b>'+(q.telefone?'<div>'+esc(q.telefone)+'</div>':'')+'</div><div><small class="lb">Situação</small>'+qtag(q.status)+'</div></div>'+
+ '<div class="tablewrap" style="margin-top:12px"><table><thead><tr><th>Descrição</th><th class="r">Qtd.</th><th class="r">Unitário</th><th class="r">Total</th></tr></thead><tbody>'+q.itens.map(i=>'<tr><td>'+esc(i.desc)+'</td><td class="r">'+fq(i.qtd)+' '+esc(i.un||'')+'</td><td class="r">'+money(i.valor)+'</td><td class="r">'+money(i.qtd*i.valor)+'</td></tr>').join('')+'</tbody></table></div>'+
+ '<div class="totals">'+(q.desconto>0?'<div class="totalrow"><span>Subtotal</span><b>'+money(sub)+'</b></div><div class="totalrow"><span>Desconto</span><b>-'+money(q.desconto)+'</b></div>':'')+'<div class="totalrow final"><span>Total</span><strong>'+money(total(q))+'</strong></div></div>'+
+ (cond.length?'<div class="docsec"><h4>Condições</h4>'+cond.map(c=>'<div style="margin-bottom:8px"><small class="lb">'+c[0]+'</small><div style="white-space:pre-line;overflow-wrap:anywhere">'+esc(c[1])+'</div></div>').join('')+'</div>':'')+
+ '<div class="docsig"><div>Assinatura do cliente</div><div>'+esc(e.responsavel||e.nome||'Responsável')+'</div></div></div>';
+}
+function quoteText(q){
+ const e=db.empresa,L=[];
+ L.push('*ORÇAMENTO '+q.numero+'*'+(e.nome?' - '+e.nome:''));
+ L.push('Cliente: '+q.clienteNome);
+ L.push('Data: '+date(q.data)+' | Validade: '+date(q.validade));L.push('');
+ q.itens.forEach((i,n)=>L.push((n+1)+') '+i.desc+'\n    '+fq(i.qtd)+' '+(i.un||'')+' x '+money(i.valor)+' = '+money(i.qtd*i.valor)));
+ L.push('');
+ if(q.desconto>0){L.push('Subtotal: '+money(subtotal(q)));L.push('Desconto: -'+money(q.desconto))}
+ L.push('*TOTAL: '+money(total(q))+'*');
+ if(q.garantia)L.push('','Garantia: '+q.garantia);
+ if(q.pagamento)L.push('Pagamento: '+q.pagamento);
+ if(e.pix)L.push('Pix: '+e.pix);
+ if(q.obs)L.push('','Obs: '+q.obs);
+ return L.join('\n');
+}
+function viewQuote(q){
+ if(!q)return;
+ modal({title:'Orçamento '+q.numero,wide:true,cancel:'Fechar',
+ body:'<div class="statusbar" role="group" aria-label="Situação do orçamento">'+Object.keys(QLABEL).map(k=>'<button data-st="'+k+'" class="'+(q.status===k?'on':'')+'">'+QLABEL[k]+'</button>').join('')+'</div>'+quoteDoc(q),
+ actions:[
+  {label:'Enviar PDF',cls:'primary',fn:()=>deliver(()=>quotePdf(q),q.numero+'.pdf','share',q.numero+' - '+q.clienteNome,quoteText(q))},
+  {label:'Baixar PDF',fn:()=>deliver(()=>quotePdf(q),q.numero+'.pdf','save')},
+  {label:'WhatsApp',fn:()=>openWhats(q)},
+  {label:'Copiar texto',fn:()=>copyText(quoteText(q),'Texto copiado. É só colar no WhatsApp.')},
+  {label:'Editar',fn:()=>quoteForm(q)},{label:'Duplicar',fn:()=>dupQuote(q)},{label:'Excluir',cls:'danger',fn:()=>delQuote(q)}],
+ onOpen:()=>$$('[data-st]').forEach(b=>b.onclick=()=>{q.status=b.dataset.st;persist();render();viewQuote(q)})});
+}
+function openWhats(q){
+ let phone=(q.telefone||'').replace(/\D/g,'');if(phone&&phone.length<=11)phone='55'+phone;
+ const url='https://wa.me/'+phone+'?text='+encodeURIComponent(quoteText(q));
+ window.open(url,'_blank')||(location.href=url);
+}
+function copyText(t,msg){
+ const ok=()=>notify(msg||'Copiado.');
+ const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0;top:0';document.body.appendChild(ta);ta.select();let r=false;try{r=document.execCommand('copy')}catch(e){}ta.remove();r?ok():notify('Não consegui copiar automaticamente.')};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb();
+}
+
+/* ----- PDF ----- */
+const logoCache={};
+function logoJpeg(){
+ const src=db.empresa.logo;if(!src)return Promise.resolve(null);
+ if(logoCache.src===src)return Promise.resolve(logoCache.v);
+ return new Promise(res=>{
+  const im=new Image();
+  im.onload=()=>{try{
+   const sc=Math.min(1,600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));
+   const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);
+   const b=atob(c.toDataURL('image/jpeg',.92).split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+   const info=parseJpeg(u);logoCache.src=src;logoCache.v={bytes:u,width:info.width,height:info.height,comps:info.comps};res(logoCache.v)
+  }catch(e){res(null)}};
+  im.onerror=()=>res(null);im.src=src;
+ });
+}
+const C_ACC=[22,119,232],C_INK=[23,34,53],C_MUT=[113,128,150],C_LN=[228,234,241];
+class Doc{
+ constructor(title,logo){this.p=new Pdf(title);this.y=15;this.M=15;this.R=195;this.logo=logo}
+ ensure(h){if(this.y+h>284){this.p.addPage();this.y=this.M}}
+ header(title,num){
+  const p=this.p,e=db.empresa,M=this.M,R=this.R;let x0=M;
+  if(this.logo){let h=18,w=h*this.logo.width/this.logo.height;if(w>46){w=46;h=w*this.logo.height/this.logo.width}p.image(this.logo,M,this.y,w,h);x0=M+w+5}
+  const maxW=R-x0-44;
+  p.setFont(true);p.setSize(15);p.setText(C_INK);
+  const nm=p.split(e.nome||'Sua empresa',maxW);p.text(nm[0],x0,this.y+5);
+  p.setFont(false);p.setSize(8.5);p.setText(C_MUT);let dy=this.y+10.5;
+  const det=[e.documento,e.telefone,e.email].filter(Boolean).join('  |  ');
+  if(det){p.text(p.split(det,maxW)[0],x0,dy);dy+=4.5}
+  if(e.endereco)p.text(p.split(e.endereco,maxW)[0],x0,dy);
+  p.setFont(true);p.setSize(19);p.setText(C_ACC);p.text(title,R,this.y+5,{align:'right'});
+  p.setSize(10);p.setText(C_INK);p.text(num,R,this.y+11,{align:'right'});
+  this.y+=24;p.setDraw(C_ACC);p.line(M,this.y,R,this.y,0.8);this.y+=5;
+ }
+ sec(t){const p=this.p;this.ensure(16);this.y+=5;p.setFont(true);p.setSize(10.5);p.setText(C_ACC);p.text(t.toUpperCase(),this.M,this.y);p.setDraw(C_ACC);p.line(this.M,this.y+1.6,this.R,this.y+1.6,0.4);this.y+=7}
+ kv(k,v){
+  if(!v)return;const p=this.p;p.setFont(false);p.setSize(10);const ls=p.split(String(v),this.R-this.M-44);
+  this.ensure(ls.length*4.6+2);
+  p.setFont(true);p.setSize(8);p.setText(C_MUT);p.text(k.toUpperCase(),this.M,this.y);
+  p.setFont(false);p.setSize(10);p.setText(C_INK);ls.forEach((l,i)=>p.text(l,this.M+44,this.y+i*4.6));
+  this.y+=ls.length*4.6+1.5;
+ }
+ para(label,text){
+  if(!text)return;const p=this.p;p.setFont(false);p.setSize(10);const ls=p.split(String(text),this.R-this.M);
+  this.ensure(ls.length*4.6+11);
+  p.setFont(true);p.setSize(8);p.setText(C_MUT);p.text(label.toUpperCase(),this.M,this.y);
+  p.setFont(false);p.setSize(10);p.setText(C_INK);ls.forEach((l,i)=>p.text(l,this.M,this.y+5+i*4.6));
+  this.y+=ls.length*4.6+9;
+ }
+ table(cols,rows){
+  const p=this.p,M=this.M,R=this.R;
+  const head=()=>{p.setFill(C_ACC);p.rect(M,this.y,R-M,7);p.setFont(true);p.setSize(8.5);p.setText([255,255,255]);let x=M;cols.forEach(c=>{p.text(c.h,c.al==='r'?x+c.w-2:x+2,this.y+4.8,{align:c.al==='r'?'right':'left'});x+=c.w});this.y+=7};
+  this.ensure(22);head();
+  rows.forEach(r=>{
+   p.setFont(false);p.setSize(9);
+   const cells=r.map((s,i)=>p.split(String(s==null?'':s),cols[i].w-4));
+   const h=Math.max(7,Math.max(...cells.map(c=>c.length))*4.2+3);
+   if(this.y+h>284){p.addPage();this.y=M;head();p.setFont(false);p.setSize(9)}
+   p.setText(C_INK);let x=M;
+   cells.forEach((c,i)=>{c.forEach((l,j)=>p.text(l,cols[i].al==='r'?x+cols[i].w-2:x+2,this.y+5+j*4.2,{align:cols[i].al==='r'?'right':'left'}));x+=cols[i].w});
+   p.setDraw(C_LN);p.line(M,this.y+h,R,this.y+h,0.2);this.y+=h;
+  });
+  this.y+=2;
+ }
+ sign(a,b,sub){
+  const p=this.p,M=this.M,R=this.R;this.ensure(34);this.y+=18;p.setDraw(C_INK);
+  p.line(M,this.y,M+80,this.y,0.3);if(b)p.line(R-80,this.y,R,this.y,0.3);
+  p.setFont(false);p.setSize(9);p.setText(C_INK);p.text(p.split(a,80)[0],M,this.y+4.5);if(b)p.text(p.split(b,80)[0],R-80,this.y+4.5);
+  if(sub){p.setSize(8);p.setText(C_MUT);p.text(p.split(sub,80)[0],M,this.y+8.5)}
+  this.y+=12;
+ }
+ note(t){const p=this.p;this.ensure(8);p.setFont(false);p.setSize(8);p.setText(C_MUT);p.split(t,this.R-this.M).forEach((l,i)=>p.text(l,this.M,this.y+i*3.8));this.y+=8}
+ bytes(){return this.p.output()}
+}
+async function quotePdf(q){
+ const e=db.empresa,d=new Doc(q.numero,await logoJpeg()),p=d.p,sub=subtotal(q);
+ d.header('ORÇAMENTO',q.numero);
+ p.setFont(true);p.setSize(8);p.setText(C_MUT);p.text('CLIENTE',d.M,d.y);p.text('EMISSÃO',d.R-62,d.y);p.text('VALIDADE',d.R-30,d.y);
+ p.setFont(false);p.setSize(10);p.setText(C_INK);
+ const cl=[q.clienteNome,q.telefone].filter(Boolean);cl.forEach((t,i)=>p.text(p.split(t,100)[0],d.M,d.y+5+i*5));
+ p.text(date(q.data),d.R-62,d.y+5);p.text(date(q.validade),d.R-30,d.y+5);
+ d.y+=Math.max(cl.length*5+6,12)+4;
+ d.table([{h:'Descrição',w:90},{h:'Qtd.',w:26,al:'r'},{h:'Unitário',w:32,al:'r'},{h:'Total',w:32,al:'r'}],q.itens.map(i=>[i.desc,fq(i.qtd)+' '+(i.un||''),money(i.valor),money(i.qtd*i.valor)]));
+ d.ensure(26);d.y+=4;
+ p.setFont(false);p.setSize(10);p.setText(C_INK);
+ if(q.desconto>0){p.text('Subtotal',d.R-70,d.y);p.text(money(sub),d.R-2,d.y,{align:'right'});d.y+=6;p.text('Desconto',d.R-70,d.y);p.text('-'+money(q.desconto),d.R-2,d.y,{align:'right'});d.y+=7}
+ p.setDraw(C_ACC);p.line(d.R-70,d.y-5,d.R,d.y-5,0.6);
+ p.setFont(true);p.setSize(13);p.setText(C_ACC);p.text('TOTAL',d.R-70,d.y+1);p.text(money(total(q)),d.R-2,d.y+1,{align:'right'});d.y+=14;
+ d.para('Validade da proposta','Até '+date(q.validade));d.para('Garantia',q.garantia);d.para('Forma de pagamento',q.pagamento);d.para('Chave Pix',e.pix);d.para('Observações',q.obs);
+ d.sign('Assinatura do cliente',e.responsavel||e.nome||'Responsável');
+ return d.bytes();
+}
+async function pmocPdf(pl){
+ const e=db.empresa,d=new Doc(pl.numero,await logoJpeg()),p=d.p,c=client(pl.clienteId),eq=pmocEquips(pl),btu=btuSum(pl),rec=pmocRecords(pl);
+ d.header('PMOC',pl.numero);
+ d.sec('Local atendido');
+ d.kv('Nome',c?.nome);d.kv('CNPJ / CPF',c?.documento);d.kv('Endereço',c?.endereco);d.kv('Ambiente / unidade',pl.ambiente);d.kv('Contato no local',pl.contato||c?.telefone);d.kv('Elaborado em',date(pl.criado));
+ d.sec('Responsável técnico');
+ d.kv('Nome',pl.rtNome);d.kv('Registro',pl.rtCons+(pl.rtReg?' '+pl.rtReg:''));d.kv(pl.rtTipo,pl.rtNum);
+ d.sec('Equipamentos');
+ d.table([{h:'Ambiente',w:50},{h:'Equipamento',w:64},{h:'BTU/h',w:36,al:'r'},{h:'Ocupantes',w:30,al:'r'}],eq.length?eq.map(x=>[x.local||'—',[x.nome,x.tipo,x.marca,x.modelo].filter(Boolean).join(' · '),x.btus?fq(x.btus):'—',x.ocup?fq(x.ocup):'—']):[['—','Nenhum equipamento no plano','—','—']]);
+ d.ensure(8);p.setFont(true);p.setSize(10);p.setText(C_INK);p.text('Capacidade total: '+fq(btu)+' BTU/h ('+fq(Math.round(btu/12000*10)/10)+' TR)',d.M,d.y+3);d.y+=8;
+ d.sec('Plano de manutenção');
+ d.kv('Periodicidade das visitas',pl.periodo);d.kv('Próxima prevista',date(pl.proxima));
+ d.table([{h:'Tarefa',w:130},{h:'Frequência',w:50,al:'r'}],pl.tarefas.map(t=>[t.desc,t.freq]));
+ d.sec('Registro de manutenções');
+ d.table([{h:'Data',w:22},{h:'Técnico',w:32},{h:'Atividades',w:58},{h:'Peças',w:32},{h:'Não conformidades',w:36}],rec.length?rec.map(h=>[date(h.data),h.tecnico||'—',[(h.feitas||[]).join('; '),h.obs].filter(Boolean).join(' | ')||h.titulo,h.pecas||'—',h.nc||'—']):[['—','—','Nenhuma manutenção registrada ainda.','—','—']]);
+ if(pl.obs){d.sec('Observações');d.para('',pl.obs)}
+ d.sign(pl.rtNome||'Responsável técnico','',pl.rtCons+(pl.rtReg?' '+pl.rtReg:'')+(pl.rtNum?' | '+pl.rtTipo+' '+pl.rtNum:''));
+ d.note('Documento de apoio. O plano deve ser revisado e assinado pelo responsável técnico habilitado.');
+ return d.bytes();
+}
+async function deliver(build,filename,mode,title,text){
+ let bytes;try{bytes=await build()}catch(err){console.error(err);return notify('Não consegui gerar o PDF. Tente de novo.')}
+ const blob=new Blob([bytes],{type:'application/pdf'});
+ if(mode==='share'){
+  try{
+   const file=new File([blob],filename,{type:'application/pdf'});
+   if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:title||filename,text:text||''});return}
+  }catch(err){if(err&&err.name==='AbortError')return}
+  notify('Este aparelho não compartilha arquivo direto. Baixando o PDF.');
+ }
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
+ if(mode!=='share')notify('PDF gerado.');
+}
+
+/* ----- PMOC ----- */
+const pmocEquips=p=>(p.equipIds||[]).map(equipmentBy).filter(Boolean);
+const btuSum=p=>pmocEquips(p).reduce((s,e)=>s+(Number(e.btus)||0),0);
+const pmocRecords=p=>db.historico.filter(h=>h.pmocId===p.id).sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+function syncPmoc(p){const r=pmocRecords(p),last=r.length?r[r.length-1].data:'';p.ultima=last;p.proxima=nextFrom(last||p.criado,p.periodo)}
+function pmocForm(p){
+ const v=p||{},e=db.empresa,sel=new Set(v.equipIds||[]);
+ const tarefas=(v.tarefas&&v.tarefas.length?v.tarefas:DEF_TASKS.map(t=>({desc:t[0],freq:t[1]}))).map(t=>({...t}));
+ if(!db.clientes.length)return modal({title:'Cadastre um cliente primeiro',cancel:'Fechar',body:'<p style="margin:0;line-height:1.6">O plano PMOC é feito para um cliente e para os equipamentos dele. Cadastre o cliente e os equipamentos, depois volte aqui.</p>',actions:[{label:'Novo cliente',cls:'primary',fn:()=>clientForm()}]});
+ const periodo=v.periodo||'Mensal';
+ modal({title:p?'Editar plano PMOC':'Novo plano PMOC',wide:true,body:
+ '<div class="formgrid">'+fs('Cliente (local atendido) *','f-cliente',[['','Selecione'],...db.clientes.map(c=>[c.id,c.nome])],v.clienteId||'',true)+
+ fi('Nome do plano *','f-titulo',v.titulo,'placeholder="Ex.: PMOC unidade matriz"')+fi('Ambiente / unidade','f-amb',v.ambiente)+fi('Contato no local','f-contato',v.contato,'',true)+'</div>'+
+ '<h4 class="formh">Equipamentos do plano *</h4><div id="equipchecks"></div>'+
+ '<h4 class="formh">Periodicidade</h4><div class="formgrid">'+fs('Periodicidade das visitas','f-periodo',PERIODOS,periodo,true)+fi('Última execução','f-ultima',v.ultima,'type="date"')+fi('Próxima manutenção','f-proxima',v.proxima||nextFrom(v.ultima||v.criado||today(),periodo),'type="date"')+'</div>'+
+ '<h4 class="formh">Responsável técnico</h4><div class="formgrid">'+fi('Nome','f-rtnome',v.rtNome!=null?v.rtNome:e.responsavel,'',true)+fs('Conselho','f-rtcons',['CFT','CREA'],v.rtCons||e.rtCons||'CFT')+fi('Nº de registro','f-rtreg',v.rtReg!=null?v.rtReg:e.rtReg)+fs('Documento de responsabilidade','f-rttipo',['TRT','ART'],v.rtTipo||'TRT')+fi('Nº do TRT ou ART','f-rtnum',v.rtNum)+'</div>'+
+ '<h4 class="formh">Plano de manutenção</h4><p class="muted" style="margin:0 0 10px">Sugestão para splits. O responsável técnico deve ajustar tarefas e frequências para cada instalação.</p><div id="pmoctasks"></div><button class="btn small" id="addtask" type="button">+ Tarefa</button>'+
+ '<div style="margin-top:14px">'+ft('Observações','f-obs',v.obs,true)+'</div>',
+ actions:[{label:'Salvar plano',cls:'primary',fn:()=>{
+  const clienteId=$('#f-cliente').value,titulo=$('#f-titulo').value.trim();
+  if(!clienteId||!titulo)return notify('Selecione o cliente e dê um nome ao plano.');
+  if(!sel.size)return notify('Marque pelo menos um equipamento do plano.');
+  const per=$('#f-periodo').value,ult=$('#f-ultima').value,criado=v.criado||today();
+  const x={id:v.id||uid(),numero:v.numero,clienteId,titulo,ambiente:$('#f-amb').value.trim(),contato:$('#f-contato').value.trim(),periodo:per,ultima:ult,proxima:$('#f-proxima').value||nextFrom(ult||criado,per),criado,
+   rtNome:$('#f-rtnome').value.trim(),rtCons:$('#f-rtcons').value,rtReg:$('#f-rtreg').value.trim(),rtTipo:$('#f-rttipo').value,rtNum:$('#f-rtnum').value.trim(),
+   equipIds:[...sel],tarefas:tarefas.filter(t=>String(t.desc||'').trim()).map(t=>({desc:t.desc.trim(),freq:t.freq})),obs:$('#f-obs').value.trim(),status:'ativo'};
+  if(!x.numero){db.seq.pmoc++;x.numero='PMOC-'+pad(db.seq.pmoc)}
+  if(p)Object.assign(p,x);else db.pmocs.push(x);
+  if(persist()){const r=p||x;render();notify('Plano salvo!');viewPmoc(r)}}}],
+ onOpen:()=>{
+  const drawEq=()=>{
+   const cid=$('#f-cliente').value,list=db.equipamentos.filter(x=>x.clienteId===cid);
+   $('#equipchecks').innerHTML=!cid?'<div class="muted">Escolha o cliente para listar os equipamentos dele.</div>':list.length?'<div class="checks">'+list.map(x=>'<label class="check"><input type="checkbox" data-eq="'+x.id+'"'+(sel.has(x.id)?' checked':'')+'><span><b>'+esc(x.nome)+'</b><br><span class="muted">'+esc([x.tipo,x.marca,x.modelo].filter(Boolean).join(' · '))+' · '+fmtBtu(x.btus)+(x.local?' · '+esc(x.local):'')+'</span></span></label>').join('')+'</div><div class="muted" style="margin-top:8px">Capacidade total do plano: <b id="btutot">'+fmtBtu(list.filter(x=>sel.has(x.id)).reduce((s,x)=>s+(x.btus||0),0))+'</b></div>':'<div class="sectionnote">Este cliente ainda não tem equipamentos. Cadastre na aba Equipamentos e volte aqui.</div>';
+  };
+  const drawTasks=()=>{$('#pmoctasks').innerHTML=tarefas.map((t,i)=>'<div class="taskrow"><input data-ti="'+i+'" data-tk="desc" value="'+esc(t.desc)+'" placeholder="Tarefa" aria-label="Tarefa"><select data-ti="'+i+'" data-tk="freq" aria-label="Frequência">'+FREQ.map(f=>'<option'+(t.freq===f?' selected':'')+'>'+f+'</option>').join('')+'</select><button class="btn small danger" data-trm="'+i+'" type="button" aria-label="Remover tarefa">×</button></div>').join('')};
+  const recalc=()=>{$('#f-proxima').value=nextFrom($('#f-ultima').value||v.criado||today(),$('#f-periodo').value)};
+  $('#f-cliente').onchange=()=>{sel.clear();drawEq()};
+  $('#equipchecks').addEventListener('change',ev=>{const id=ev.target.dataset.eq;if(!id)return;ev.target.checked?sel.add(id):sel.delete(id);const b=$('#btutot');if(b)b.textContent=fmtBtu(db.equipamentos.filter(x=>sel.has(x.id)).reduce((s,x)=>s+(x.btus||0),0))});
+  $('#pmoctasks').addEventListener('input',ev=>{const t=ev.target;if(t.dataset.ti!=null)tarefas[+t.dataset.ti][t.dataset.tk]=t.value});
+  $('#pmoctasks').addEventListener('change',ev=>{const t=ev.target;if(t.dataset.ti!=null)tarefas[+t.dataset.ti][t.dataset.tk]=t.value});
+  $('#pmoctasks').addEventListener('click',ev=>{const b=ev.target.closest('[data-trm]');if(b){tarefas.splice(+b.dataset.trm,1);drawTasks()}});
+  $('#addtask').onclick=()=>{tarefas.push({desc:'',freq:'Mensal'});drawTasks()};
+  $('#f-periodo').onchange=recalc;$('#f-ultima').onchange=recalc;
+  drawEq();drawTasks();
+ }});
+}
+function pmocDoc(pl){
+ const c=client(pl.clienteId),eq=pmocEquips(pl),btu=btuSum(pl),rec=pmocRecords(pl);
+ return '<div class="doc">'+companyHead('<div class="doctitle">PMOC</div><b>'+esc(pl.numero)+'</b><div class="docsm">Elaborado em '+date(pl.criado)+'</div>')+
+ '<div class="docgrid"><div><small class="lb">Local atendido</small><b>'+esc(c?.nome||'—')+'</b>'+(c?.documento?'<div>'+esc(c.documento)+'</div>':'')+(c?.endereco?'<div>'+esc(c.endereco)+'</div>':'')+(pl.ambiente?'<div class="docsm">'+esc(pl.ambiente)+'</div>':'')+((pl.contato||c?.telefone)?'<div class="docsm">Contato: '+esc(pl.contato||c.telefone)+'</div>':'')+'</div>'+
+ '<div><small class="lb">Responsável técnico</small><b>'+esc(pl.rtNome||'—')+'</b><div>'+esc(pl.rtCons)+(pl.rtReg?' '+esc(pl.rtReg):'')+'</div>'+(pl.rtNum?'<div>'+esc(pl.rtTipo)+' '+esc(pl.rtNum)+'</div>':'<div class="docsm">'+esc(pl.rtTipo)+' não informado</div>')+'</div></div>'+
+ '<div class="docsec"><h4>Equipamentos</h4><div class="tablewrap"><table><thead><tr><th>Ambiente</th><th>Equipamento</th><th class="r">BTU/h</th><th class="r">Ocupantes</th></tr></thead><tbody>'+(eq.length?eq.map(x=>'<tr><td>'+esc(x.local||'—')+'</td><td>'+esc([x.nome,x.tipo,x.marca,x.modelo].filter(Boolean).join(' · '))+'</td><td class="r">'+(x.btus?fq(x.btus):'—')+'</td><td class="r">'+(x.ocup?fq(x.ocup):'—')+'</td></tr>').join(''):'<tr><td colspan="4">Nenhum equipamento no plano.</td></tr>')+'</tbody></table></div><div class="docsm" style="margin-top:6px">Capacidade total: <b>'+fq(btu)+' BTU/h</b> ('+fq(Math.round(btu/12000*10)/10)+' TR)'+(btu>60000?' · acima de 60.000 BTU/h':'')+'</div></div>'+
+ '<div class="docsec"><h4>Plano de manutenção</h4><div class="docsm" style="margin-bottom:6px">Periodicidade das visitas: <b>'+esc(pl.periodo)+'</b> · Próxima prevista: <b>'+date(pl.proxima)+'</b></div><div class="tablewrap"><table><thead><tr><th>Tarefa</th><th class="r">Frequência</th></tr></thead><tbody>'+pl.tarefas.map(t=>'<tr><td>'+esc(t.desc)+'</td><td class="r">'+esc(t.freq)+'</td></tr>').join('')+'</tbody></table></div></div>'+
+ '<div class="docsec"><h4>Registro de manutenções</h4><div class="tablewrap"><table><thead><tr><th class="r">Data</th><th>Técnico</th><th>Atividades</th><th>Peças</th><th>Não conformidades</th></tr></thead><tbody>'+(rec.length?rec.map(h=>'<tr><td class="r">'+date(h.data)+'</td><td>'+esc(h.tecnico||'—')+'</td><td>'+esc([(h.feitas||[]).join('; '),h.obs].filter(Boolean).join(' | ')||h.titulo)+'</td><td>'+esc(h.pecas||'—')+'</td><td>'+esc(h.nc||'—')+'</td></tr>').join(''):'<tr><td colspan="5">Nenhuma manutenção registrada ainda.</td></tr>')+'</tbody></table></div></div>'+
+ (pl.obs?'<div class="docsec"><h4>Observações</h4><div style="white-space:pre-line;overflow-wrap:anywhere">'+esc(pl.obs)+'</div></div>':'')+
+ '<div class="docsig"><div>'+esc(pl.rtNome||'Responsável técnico')+'<br><span class="docsm">'+esc(pl.rtCons)+(pl.rtReg?' '+esc(pl.rtReg):'')+(pl.rtNum?' · '+esc(pl.rtTipo)+' '+esc(pl.rtNum):'')+'</span></div></div>'+
+ '<div class="docnote">Documento de apoio. O plano deve ser revisado e assinado pelo responsável técnico habilitado.</div></div>';
+}
+function pmocResumo(pl){
+ const c=client(pl.clienteId),L=[];
+ L.push('*'+pl.numero+' - PMOC*'+(db.empresa.nome?' - '+db.empresa.nome:''));
+ L.push('Local: '+(c?.nome||'-')+(c?.endereco?' ('+c.endereco+')':''));
+ L.push('Equipamentos: '+pmocEquips(pl).length+' | Capacidade: '+fq(btuSum(pl))+' BTU/h');
+ L.push('Periodicidade: '+pl.periodo+' | Próxima manutenção: '+date(pl.proxima));
+ if(pl.rtNome)L.push('Responsável técnico: '+pl.rtNome+' ('+pl.rtCons+(pl.rtReg?' '+pl.rtReg:'')+')');
+ L.push('','Plano:');pl.tarefas.forEach(t=>L.push('- '+t.desc+' ('+t.freq+')'));
+ return L.join('\n');
+}
+function viewPmoc(pl){
+ if(!pl)return;
+ modal({title:pl.numero+' · '+pl.titulo,wide:true,cancel:'Fechar',body:pmocDoc(pl),
+ actions:[{label:'Registrar manutenção',cls:'primary',fn:()=>recordForm(pl)},
+  {label:'Enviar PDF',fn:()=>deliver(()=>pmocPdf(pl),pl.numero+'.pdf','share',pl.numero+' - '+pl.titulo,pmocResumo(pl))},
+  {label:'Baixar PDF',fn:()=>deliver(()=>pmocPdf(pl),pl.numero+'.pdf','save')},
+  {label:'Copiar resumo',fn:()=>copyText(pmocResumo(pl),'Resumo copiado.')},
+  {label:'Editar',fn:()=>pmocForm(pl)},{label:'Excluir',cls:'danger',fn:()=>delPmoc(pl)}]});
+}
+function delPmoc(pl){
+ if(!pl)return;const n=pmocRecords(pl).length;
+ confirmBox('Excluir o plano <b>'+esc(pl.numero+' · '+pl.titulo)+'</b>?'+(n?' Os '+n+' registro(s) de manutenção dele continuam no Histórico.':''),'Excluir plano',()=>{
+  db.historico.forEach(h=>{if(h.pmocId===pl.id)h.pmocId=''});
+  db.pmocs=db.pmocs.filter(x=>x.id!==pl.id);persist();render();notify('Plano excluído.')});
+}
+function recordForm(pl){
+ if(!pl)return;
+ const eq=pmocEquips(pl),n=pmocRecords(pl).length,base=MONTHS[pl.periodo]||1;
+ const due=t=>{if(n===0)return true;const r=Math.max(1,Math.ceil((MONTHS[t.freq]||1)/base));return (n+1)%r===0};
+ modal({title:'Registrar manutenção',wide:true,body:
+ '<div class="sectionnote">O registro entra no histórico e atualiza a próxima data do plano. Marquei as tarefas que costumam vencer nesta visita. Ajuste se precisar.</div>'+
+ '<div class="formgrid">'+fi('Data *','f-data',today(),'type="date"')+fi('Técnico','f-tecnico',pl.rtNome)+
+ fs('Equipamento','f-equip',[['','Todos os equipamentos do plano'],...eq.map(e=>[e.id,e.nome])],'',true)+'</div>'+
+ '<h4 class="formh">Tarefas executadas</h4><div class="checks">'+pl.tarefas.map((t,i)=>'<label class="check"><input type="checkbox" data-ti="'+i+'"'+(due(t)?' checked':'')+'><span>'+esc(t.desc)+' <span class="muted">· '+esc(t.freq)+'</span></span></label>').join('')+'</div>'+
+ '<div class="formgrid" style="margin-top:14px">'+ft('Outras atividades, medições e observações','f-extra','',true)+ft('Peças substituídas','f-pecas','',true)+ft('Não conformidades encontradas','f-nc','',true)+fi('Próxima manutenção','f-proxima',nextFrom(today(),pl.periodo),'type="date"')+'</div>',
+ actions:[{label:'Salvar registro',cls:'primary',fn:()=>{
+  const data=$('#f-data').value;if(!data)return notify('Informe a data.');
+  const feitas=$$('#modalbody [data-ti]').filter(c=>c.checked).map(c=>pl.tarefas[+c.dataset.ti].desc),extra=$('#f-extra').value.trim();
+  if(!feitas.length&&!extra)return notify('Marque as tarefas feitas ou descreva a atividade.');
+  db.historico.push({id:uid(),clienteId:pl.clienteId,equipamentoId:$('#f-equip').value,titulo:'Manutenção preventiva ('+pl.periodo.toLowerCase()+')',data,tecnico:$('#f-tecnico').value.trim(),obs:extra,pecas:$('#f-pecas').value.trim(),nc:$('#f-nc').value.trim(),feitas,pmocId:pl.id});
+  const r=pmocRecords(pl),last=r[r.length-1].data;pl.ultima=last;pl.proxima=data>=last?($('#f-proxima').value||nextFrom(data,pl.periodo)):nextFrom(last,pl.periodo);
+  if(persist()){render();notify('Manutenção registrada!');viewPmoc(pl)}}}],
+ onOpen:()=>{$('#f-data').onchange=()=>{$('#f-proxima').value=nextFrom($('#f-data').value||today(),pl.periodo)}}});
+}
+function delHistory(h){
+ if(!h)return;
+ confirmBox('Excluir este registro de <b>'+date(h.data)+'</b>? Essa ação não pode ser desfeita.','Excluir registro',()=>{
+  db.historico=db.historico.filter(x=>x.id!==h.id);
+  const pl=db.pmocs.find(p=>p.id===h.pmocId);if(pl)syncPmoc(pl);
+  persist();render();notify('Registro excluído.')});
+}
+
+/* ----- empresa e backup ----- */
+function collectCompany(){
+ const e=db.empresa,g=id=>{const el=$('#'+id);return el?el.value.trim():null},set=(k,id)=>{const v=g(id);if(v!==null)e[k]=v};
+ set('nome','co-nome');set('documento','co-doc');set('telefone','co-tel');set('email','co-email');set('endereco','co-end');set('pix','co-pix');set('garantia','co-gar');set('pagamento','co-pag');set('responsavel','co-resp');set('rtCons','co-cons');set('rtReg','co-reg');
+ const v=g('co-val');if(v!==null)e.validadeDias=Math.max(1,Number(v)||15);
+}
+function logoUpload(f){
+ if(!f)return;
+ if(!f.type.startsWith('image/'))return notify('Selecione uma imagem válida.');
+ if(f.size>8*1024*1024)return notify('Imagem muito grande. Use até 8 MB.');
+ collectCompany();
+ const r=new FileReader();
+ r.onload=()=>{const im=new Image();
+  im.onload=()=>{const sc=Math.min(1,500/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));c.getContext('2d').drawImage(im,0,0,c.width,c.height);db.empresa.logo=c.toDataURL('image/png');if(persist()){render();notify('Logo salva!')}};
+  im.onerror=()=>notify('Não consegui abrir essa imagem.');im.src=r.result};
+ r.readAsDataURL(f);
+}
+function exportBackup(){
+ db.meta.lastBackup=new Date().toISOString();persist();
+ const blob=new Blob([JSON.stringify({...db,backupDate:db.meta.lastBackup,app:'OrçaFrio'},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='orcafrio-backup-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
+ render();notify('Backup exportado!');
+}
+function importFile(){
+ const f=$('#backupfile')?.files[0];if(!f)return notify('Selecione um arquivo de backup.');
+ const r=new FileReader();r.onload=()=>restoreFrom(r.result);r.readAsText(f);
+}
+function restoreFrom(text){
+ let x;try{x=JSON.parse(text);if(!x||!Array.isArray(x.clientes)||!Array.isArray(x.orcamentos))throw Error()}catch{return notify('Arquivo ou texto inválido ou incompatível.')}
+ confirmBox('Isso substitui todos os dados atuais pelos do backup. Continuar?','Restaurar',()=>{db=norm(merge(x));if(persist()){render();notify('Backup restaurado!')}});
+}
+
+render();
+persist();
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
