@@ -139,6 +139,8 @@ tr:last-child td{border-bottom:0}
 .docsig{margin-top:38px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .docsig div{border-top:1px solid var(--ink);padding-top:6px;min-width:200px;flex:1;font-size:12px}
 .docnote{color:var(--muted);font-size:11px;margin-top:14px}
+.recbox{border:1px solid var(--line);background:#f3f8fe;border-radius:12px;padding:14px 16px;margin:4px 0 16px}
+.recval{font:800 30px var(--display);color:var(--blue);letter-spacing:.5px;overflow-wrap:anywhere}
 @media(max-width:900px){
 .shell{grid-template-columns:1fr}
 .side{display:none}
@@ -183,6 +185,7 @@ tr:last-child td{border-bottom:0}
  <div><div class="navlabel">PRINCIPAL</div><nav class="nav">
  <button data-page="dashboard" class="active"><span class="ico">▦</span> Visão geral</button>
  <button data-page="orcamentos"><span class="ico">▤</span> Orçamentos</button>
+ <button data-page="recibos"><span class="ico">▥</span> Recibos</button>
  <button data-page="clientes"><span class="ico">♙</span> Clientes</button>
  <button data-page="equipamentos"><span class="ico">❄</span> Equipamentos</button>
  <button data-page="servicos"><span class="ico">⚙</span> Serviços</button>
@@ -319,10 +322,10 @@ const DEF_SERVICES=[
  ['Tubulação de cobre com isolamento','m',85],['Suporte de condensadora','un',90],['Desinstalação de split','un',200],['Visita técnica e diagnóstico','visita',120]];
 
 /* ---------- dados ---------- */
-const blank=()=>({empresa:{nome:'',documento:'',telefone:'',email:'',endereco:'',responsavel:'',rtCons:'CFT',rtReg:'',pix:'',validadeDias:15,garantia:'',pagamento:'',logo:''},clientes:[],equipamentos:[],servicos:[],orcamentos:[],pmocs:[],historico:[],seq:{orc:0,pmoc:0},meta:{lastBackup:''}});
+const blank=()=>({empresa:{nome:'',documento:'',telefone:'',email:'',endereco:'',responsavel:'',rtCons:'CFT',rtReg:'',pix:'',validadeDias:15,garantia:'',pagamento:'',logo:''},clientes:[],equipamentos:[],servicos:[],orcamentos:[],pmocs:[],historico:[],recibos:[],seq:{orc:0,pmoc:0,rec:0},meta:{lastBackup:''}});
 function merge(x){
  const b=blank(),d={...b,...x,empresa:{...b.empresa,...(x.empresa||{})},seq:{...b.seq,...(x.seq||{})},meta:{...b.meta,...(x.meta||{})}};
- ['clientes','equipamentos','servicos','orcamentos','pmocs','historico'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[]});
+ ['clientes','equipamentos','servicos','orcamentos','pmocs','historico','recibos'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[]});
  return d;
 }
 function norm(d){
@@ -341,6 +344,9 @@ function norm(d){
  let maxP=d.seq.pmoc||0;
  d.pmocs.forEach(p=>{const m=/^PMOC-(\d+)$/.exec(p.numero||'');if(m)maxP=Math.max(maxP,Number(m[1]))});
  d.seq.pmoc=maxP;
+ let maxR=d.seq.rec||0;
+ d.recibos.forEach(r=>{const m=/^REC-(\d+)$/.exec(r.numero||'');if(m)maxR=Math.max(maxR,Number(m[1]));if(!r.forma)r.forma='Pix';if(r.orcId==null)r.orcId='';if(r.obs==null)r.obs='';if(r.documento==null)r.documento=''});
+ d.seq.rec=maxR;
  d.pmocs.forEach(p=>{
   if(!p.numero){d.seq.pmoc++;p.numero='PMOC-'+pad(d.seq.pmoc)}
   if(!Array.isArray(p.equipIds))p.equipIds=[];
@@ -398,7 +404,7 @@ const QLABEL={rascunho:'Rascunho',enviado:'Enviado',aprovado:'Aprovado',recusado
 const qtag=s=>tag(s,QLABEL[s]||s);
 function pmocState(p){if(!p.proxima)return tag('programado','Sem data');if(p.proxima<today())return tag('vencido','Vencido');if(p.proxima<=addDays(today(),7))return tag('pendente','Em breve');return tag('ativo','Em dia')}
 
-const TITLES={dashboard:'Visão geral',orcamentos:'Orçamentos',clientes:'Clientes',equipamentos:'Equipamentos',servicos:'Serviços',pmoc:'PMOC',historico:'Histórico',empresa:'Minha empresa',dados:'Backup e dados'};
+const TITLES={dashboard:'Visão geral',orcamentos:'Orçamentos',recibos:'Recibos',clientes:'Clientes',equipamentos:'Equipamentos',servicos:'Serviços',pmoc:'PMOC',historico:'Histórico',empresa:'Minha empresa',dados:'Backup e dados'};
 function nav(p,keep){
  if(p==='mais')return openMore();
  page=p;query='';if(!keep)hf={};
@@ -408,11 +414,11 @@ function nav(p,keep){
 const go=(p,f)=>{hf=f||{};nav(p,true)};
 $$('[data-page]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.page)));
 function render(){
- const f={dashboard,orcamentos:quotes,clientes:clients,equipamentos:equipment,servicos:services,pmoc,historico:history,empresa:company,dados:backup}[page]||dashboard;
+ const f={dashboard,orcamentos:quotes,recibos:receipts,clientes:clients,equipamentos:equipment,servicos:services,pmoc,historico:history,empresa:company,dados:backup}[page]||dashboard;
  $('#app').innerHTML=f();fixLabels($('#app'));
  const n=(db.empresa.nome||'OF').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();$('#avatar').textContent=n||'OF';
 }
-function openMore(){modal({title:'Mais opções',cancel:'Fechar',body:'<div class="grid">'+[['Serviços','servicos'],['Histórico técnico','historico'],['Minha empresa','empresa'],['Backup e dados','dados']].map(x=>'<button class="btn" data-goto="'+x[1]+'" style="justify-content:flex-start">'+x[0]+' →</button>').join('')+'</div>',onOpen:()=>$$('[data-goto]').forEach(b=>b.onclick=()=>{closeModal();nav(b.dataset.goto)})})}
+function openMore(){modal({title:'Mais opções',cancel:'Fechar',body:'<div class="grid">'+[['Recibos','recibos'],['Serviços','servicos'],['Histórico técnico','historico'],['Minha empresa','empresa'],['Backup e dados','dados']].map(x=>'<button class="btn" data-goto="'+x[1]+'" style="justify-content:flex-start">'+x[0]+' →</button>').join('')+'</div>',onOpen:()=>$$('[data-goto]').forEach(b=>b.onclick=()=>{closeModal();nav(b.dataset.goto)})})}
 
 /* ---------- páginas ---------- */
 function dashboard(){
@@ -424,7 +430,7 @@ function dashboard(){
  const days=db.meta.lastBackup?Math.floor((Date.now()-new Date(db.meta.lastBackup))/864e5):null;
  const nudge=hasData&&(days===null||days>=30)?'<div class="sectionnote warn">'+(days===null?'Você ainda não fez nenhum backup.':'Seu último backup foi há '+days+' dias.')+' Seus dados ficam só neste aparelho. <button class="btn small" data-action="export-backup" style="margin-left:6px">Fazer backup agora</button></div>':'';
  const noco=!db.empresa.nome?'<div class="sectionnote">Comece preenchendo os dados e a logo da sua empresa. Eles saem no topo de todo orçamento e PMOC. <button class="btn small" data-action="goto-company" style="margin-left:6px">Abrir Minha empresa</button></div>':'';
- return head('PAINEL DE CONTROLE','Visão geral','Acompanhe seus orçamentos, clientes e manutenções.',btn('+ Novo orçamento','new-quote','primary'))+noco+nudge+
+ return head('PAINEL DE CONTROLE','Visão geral','Acompanhe seus orçamentos, clientes e manutenções.',btn('+ Novo recibo','new-receipt')+btn('+ Novo orçamento','new-quote','primary'))+noco+nudge+
  '<div class="grid stats">'+
  '<div class="card stat"><div><div class="label">Orçamentos</div><div class="value">'+q.length+'</div><div class="hint">'+open.length+' em andamento</div></div><div class="symbol">▤</div></div>'+
  '<div class="card stat"><div><div class="label">Aprovados</div><div class="value">'+appr.length+'</div><div class="hint">Total '+money(apprVal)+'</div></div><div class="symbol">✓</div></div>'+
@@ -497,7 +503,7 @@ function backup(){
  '<div class="grid cols"><div class="card"><div class="cardhead"><h3>Exportar backup</h3></div><p class="muted">Baixe todos os cadastros, orçamentos, equipamentos, planos e histórico em um arquivo. Último backup: <b>'+last+'</b>.</p><div class="actions">'+btn('↓ Baixar backup','export-backup','primary')+btn('Copiar texto do backup','copy-backup')+'</div></div>'+
  '<div class="card"><div class="cardhead"><h3>Restaurar backup</h3></div><p class="muted">A restauração substitui os dados atuais. Exporte uma cópia antes de continuar.</p><div class="field"><label>Arquivo de backup</label><input type="file" id="backupfile" accept=".json,application/json"></div>'+btn('Restaurar do arquivo','import-backup')+'<div class="field" style="margin-top:14px"><label>Ou cole aqui o texto do backup</label><textarea id="backuptext" placeholder="Cole o texto copiado"></textarea></div>'+btn('Restaurar do texto','import-paste')+'</div></div>'+
  '<div class="sectionnote" style="margin-top:16px">Importante: esta versão guarda os dados neste aparelho e navegador. Limpar os dados do navegador pode apagar seus registros. Faça backups regulares.</div>'+
- '<div class="card"><h3>Resumo do armazenamento</h3><div class="detailgrid">'+[['Clientes',db.clientes.length],['Orçamentos',db.orcamentos.length],['Equipamentos',db.equipamentos.length],['Planos PMOC',db.pmocs.length],['Histórico',db.historico.length]].map(x=>'<div class="detailbox"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join('')+'</div></div>';
+ '<div class="card"><h3>Resumo do armazenamento</h3><div class="detailgrid">'+[['Clientes',db.clientes.length],['Orçamentos',db.orcamentos.length],['Recibos',db.recibos.length],['Equipamentos',db.equipamentos.length],['Planos PMOC',db.pmocs.length],['Histórico',db.historico.length]].map(x=>'<div class="detailbox"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join('')+'</div></div>';
 }
 
 /* ---------- ações ---------- */
@@ -519,6 +525,10 @@ function act(a,id){
  case 'edit-quote':return quoteForm(db.orcamentos.find(x=>x.id===id));
  case 'view-quote':return viewQuote(db.orcamentos.find(x=>x.id===id));
  case 'del-quote':return delQuote(db.orcamentos.find(x=>x.id===id));
+ case 'new-receipt':return receiptForm();
+ case 'edit-receipt':return receiptForm(db.recibos.find(x=>x.id===id));
+ case 'view-receipt':return viewReceipt(db.recibos.find(x=>x.id===id));
+ case 'del-receipt':return delReceipt(db.recibos.find(x=>x.id===id));
  case 'new-client':return clientForm();
  case 'edit-client':return clientForm(client(id));
  case 'del-client':return delClient(client(id));
@@ -698,20 +708,22 @@ function quoteText(q){
 function viewQuote(q){
  if(!q)return;
  modal({title:'Orçamento '+q.numero,wide:true,cancel:'Fechar',
- body:'<div class="statusbar" role="group" aria-label="Situação do orçamento">'+Object.keys(QLABEL).map(k=>'<button data-st="'+k+'" class="'+(q.status===k?'on':'')+'">'+QLABEL[k]+'</button>').join('')+'</div>'+quoteDoc(q),
+ body:'<div class="statusbar" role="group" aria-label="Situação do orçamento">'+Object.keys(QLABEL).map(k=>'<button data-st="'+k+'" class="'+(q.status===k?'on':'')+'">'+QLABEL[k]+'</button>').join('')+'</div>'+(quotePaid(q.id)>0?'<div class="sectionnote">Recebido até agora: <b>'+money(quotePaid(q.id))+'</b> · Saldo: <b>'+money(Math.max(0,total(q)-quotePaid(q.id)))+'</b></div>':'')+quoteDoc(q),
  actions:[
   {label:'Enviar PDF',cls:'primary',fn:()=>deliver(()=>quotePdf(q),q.numero+'.pdf','share',q.numero+' - '+q.clienteNome,quoteText(q))},
   {label:'Baixar PDF',fn:()=>deliver(()=>quotePdf(q),q.numero+'.pdf','save')},
   {label:'WhatsApp',fn:()=>openWhats(q)},
   {label:'Copiar texto',fn:()=>copyText(quoteText(q),'Texto copiado. É só colar no WhatsApp.')},
+  {label:'Gerar recibo',fn:()=>receiptForm(null,receiptFromQuote(q))},
   {label:'Editar',fn:()=>quoteForm(q)},{label:'Duplicar',fn:()=>dupQuote(q)},{label:'Excluir',cls:'danger',fn:()=>delQuote(q)}],
  onOpen:()=>$$('[data-st]').forEach(b=>b.onclick=()=>{q.status=b.dataset.st;persist();render();viewQuote(q)})});
 }
-function openWhats(q){
- let phone=(q.telefone||'').replace(/\D/g,'');if(phone&&phone.length<=11)phone='55'+phone;
- const url='https://wa.me/'+phone+'?text='+encodeURIComponent(quoteText(q));
+function openWa(tel,text){
+ let phone=(tel||'').replace(/\D/g,'');if(phone&&phone.length<=11)phone='55'+phone;
+ const url='https://wa.me/'+phone+'?text='+encodeURIComponent(text);
  window.open(url,'_blank')||(location.href=url);
 }
+const openWhats=q=>openWa(q.telefone,quoteText(q));
 function copyText(t,msg){
  const ok=()=>notify(msg||'Copiado.');
  const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0;top:0';document.body.appendChild(ta);ta.select();let r=false;try{r=document.execCommand('copy')}catch(e){}ta.remove();r?ok():notify('Não consegui copiar automaticamente.')};
@@ -842,6 +854,142 @@ async function deliver(build,filename,mode,title,text){
  }
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
  if(mode!=='share')notify('PDF gerado.');
+}
+
+/* ----- recibos ----- */
+const FORMAS=['Pix','Dinheiro','Cartão de débito','Cartão de crédito','Transferência','Boleto'];
+const U20=['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+const DZ=['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+const CT=['','cento','duzentos','trezentos','quatrocentos','quinhentos','seiscentos','setecentos','oitocentos','novecentos'];
+function ext3(n){
+ if(n===100)return 'cem';
+ const c=Math.floor(n/100),r=n%100,p=[];
+ if(c)p.push(CT[c]);
+ if(r)p.push(r<20?U20[r]:DZ[Math.floor(r/10)]+(r%10?' e '+U20[r%10]:''));
+ return p.join(' e ');
+}
+function extenso(v){
+ const cents=Math.round((Number(v)||0)*100),reais=Math.floor(cents/100),cen=cents%100,out=[];
+ if(!reais&&!cen)return 'zero reais';
+ if(reais>0){
+  const mi=Math.floor(reais/1e6),mil=Math.floor(reais%1e6/1000),r=reais%1000,segs=[];
+  if(mi)segs.push({t:ext3(mi)+(mi===1?' milhão':' milhões'),g:mi});
+  if(mil)segs.push({t:mil===1?'mil':ext3(mil)+' mil',g:mil});
+  if(r)segs.push({t:ext3(r),g:r});
+  let s=segs[0].t;
+  for(let i=1;i<segs.length;i++){const g=segs[i].g;s+=((g<100||g%100===0)?' e ':' ')+segs[i].t}
+  out.push(s+(reais%1e6===0?' de reais':reais===1?' real':' reais'));
+ }
+ if(cen)out.push(cen===1?'um centavo':ext3(cen)+' centavos');
+ return out.join(' e ');
+}
+const recNum=r=>Number(String(r.numero||'').replace(/\D/g,''))||0;
+const quoteBy=id=>db.orcamentos.find(x=>x.id===id);
+const quotePaid=id=>db.recibos.filter(x=>x.orcId===id).reduce((s,x)=>s+(Number(x.valor)||0),0);
+const recPaidUpTo=r=>db.recibos.filter(x=>x.orcId===r.orcId&&recNum(x)<=recNum(r)).reduce((s,x)=>s+(Number(x.valor)||0),0);
+const recPhone=r=>client(r.clienteId)?.telefone||quoteBy(r.orcId)?.telefone||'';
+function receiptFromQuote(q){
+ return {data:today(),forma:'Pix',orcId:q.id,clienteId:q.clienteId,clienteNome:q.clienteNome,documento:client(q.clienteId)?.documento||'',referente:'Pagamento do orçamento '+q.numero,valor:Math.max(0,Math.round((total(q)-quotePaid(q.id))*100)/100),obs:''};
+}
+function receipts(){
+ const list=db.recibos.filter(r=>((r.numero||'')+' '+r.clienteNome+' '+r.referente).toLowerCase().includes(query.toLowerCase())).sort((a,b)=>byDateDesc(a,b)||recNum(b)-recNum(a));
+ return head('FINANCEIRO','Recibos','Comprovantes de pagamento recebido, em PDF, com valor por extenso.',btn('+ Novo recibo','new-receipt','primary'))+
+ '<div class="toolbar"><input class="search" id="search" placeholder="Buscar por cliente, número ou descrição..." value="'+esc(query)+'"></div>'+
+ cardTable(['Número','Pagador','Data','Referente a','Forma','Valor','Ações'],list.map(r=>'<tr><td><b>'+esc(r.numero)+'</b></td><td>'+esc(r.clienteNome)+'</td><td>'+date(r.data)+'</td><td>'+esc(r.referente)+(r.orcId&&quoteBy(r.orcId)?'<div class="muted">'+esc(quoteBy(r.orcId).numero)+'</div>':'')+'</td><td>'+esc(r.forma)+'</td><td><b>'+money(r.valor)+'</b></td><td><div class="inline-actions"><button class="btn small" data-action="view-receipt" data-id="'+r.id+'">Abrir</button><button class="btn small" data-action="edit-receipt" data-id="'+r.id+'">Editar</button><button class="btn small danger" data-action="del-receipt" data-id="'+r.id+'">Excluir</button></div></td></tr>').join(''),'Nenhum recibo emitido ainda.','Use "Gerar recibo" dentro de um orçamento ou crie um recibo avulso.');
+}
+function receiptForm(r,pre){
+ const v=r||pre||{data:today(),forma:'Pix',valor:'',referente:'',orcId:'',obs:''};
+ const copts=db.clientes.map(c=>'<option value="'+c.id+'"'+(v.clienteId===c.id?' selected':'')+'>'+esc(c.nome)+'</option>').join('');
+ const qopts=db.orcamentos.map(q=>'<option value="'+q.id+'"'+(v.orcId===q.id?' selected':'')+'>'+esc(q.numero)+' - '+esc(q.clienteNome)+' - '+money(total(q))+'</option>').join('');
+ modal({title:r?'Editar recibo':'Novo recibo',wide:true,body:
+ '<div class="formgrid"><div class="field"><label>Cliente cadastrado</label><select id="f-cliente"><option value="">Pagador avulso / selecione</option>'+copts+'</select></div>'+
+ fi('Nome do pagador *','f-nome',v.clienteNome||'')+fi('CPF / CNPJ do pagador','f-doc',v.documento||'')+fi('Data do pagamento','f-data',v.data,'type="date"')+
+ fi('Valor recebido (R$) *','f-valor',v.valor===''||v.valor==null?'':v.valor,'type="number" min="0" step="0.01" inputmode="decimal"')+fs('Forma de pagamento','f-forma',FORMAS,v.forma||'Pix')+
+ '<div class="field span2"><label>Vincular a um orçamento (opcional)</label><select id="f-orc"><option value="">Sem vínculo</option>'+qopts+'</select></div>'+
+ ft('Referente a *','f-referente',v.referente||'',true,'placeholder="Ex.: Higienização de 3 splits"')+ft('Observações','f-obs',v.obs||'',true)+'</div>'+
+ '<div class="muted" id="recext" style="margin-top:10px"></div>',
+ actions:[{label:'Salvar recibo',cls:'primary',fn:()=>saveReceipt(r)}],
+ onOpen:()=>{
+  const ext=()=>{const n=Number($('#f-valor').value)||0;$('#recext').textContent=n>0?'Por extenso: '+extenso(n):''};
+  $('#f-valor').oninput=ext;ext();
+  $('#f-cliente').onchange=()=>{const c=client($('#f-cliente').value);if(c){$('#f-nome').value=c.nome;$('#f-doc').value=c.documento||''}};
+  $('#f-orc').onchange=()=>{
+   const q=quoteBy($('#f-orc').value);if(!q)return;
+   const c=client(q.clienteId);if(!$('#f-nome').value.trim())$('#f-nome').value=q.clienteNome;
+   if(c){$('#f-cliente').value=c.id;if(!$('#f-doc').value.trim())$('#f-doc').value=c.documento||''}
+   if(!$('#f-referente').value.trim())$('#f-referente').value='Pagamento do orçamento '+q.numero;
+   if(!Number($('#f-valor').value)){$('#f-valor').value=Math.max(0,Math.round((total(q)-quotePaid(q.id)+(r&&r.orcId===q.id?Number(r.valor)||0:0))*100)/100);ext()}
+  };
+ }});
+}
+function saveReceipt(old){
+ const nome=$('#f-nome').value.trim(),valor=Math.round((Number($('#f-valor').value)||0)*100)/100,referente=$('#f-referente').value.trim(),data=$('#f-data').value;
+ if(!nome)return notify('Informe o nome do pagador.');
+ if(!(valor>0))return notify('Informe um valor maior que zero.');
+ if(!referente)return notify('Diga a que se refere o pagamento.');
+ if(!data)return notify('Informe a data do pagamento.');
+ const c=client($('#f-cliente').value);
+ let numero=old&&old.numero;if(!numero){db.seq.rec++;numero='REC-'+pad(db.seq.rec)}
+ const x={id:old?.id||uid(),numero,clienteId:c?.id||'',clienteNome:c?.nome||nome,documento:$('#f-doc').value.trim(),data,valor,forma:$('#f-forma').value,referente,orcId:$('#f-orc').value,obs:$('#f-obs').value.trim()};
+ if(c&&$('#f-nome').value.trim()&&$('#f-nome').value.trim()!==c.nome)x.clienteNome=$('#f-nome').value.trim();
+ if(old)Object.assign(old,x);else db.recibos.push(x);
+ if(persist()){const r=old||x;render();notify('Recibo salvo!');viewReceipt(r)}
+}
+function delReceipt(r){if(!r)return;confirmBox('Excluir o recibo <b>'+esc(r.numero)+'</b> de '+esc(r.clienteNome)+'? Essa ação não pode ser desfeita.','Excluir recibo',()=>{db.recibos=db.recibos.filter(x=>x.id!==r.id);persist();render();notify('Recibo excluído.')})}
+function recSaldo(r){
+ const q=r.orcId?quoteBy(r.orcId):null;if(!q)return null;
+ const pago=recPaidUpTo(r);return {q,tot:total(q),pago,saldo:Math.max(0,Math.round((total(q)-pago)*100)/100)};
+}
+function receiptDoc(r){
+ const e=db.empresa,sd=recSaldo(r);
+ return '<div class="doc">'+companyHead('<div class="doctitle">RECIBO</div><b>'+esc(r.numero)+'</b><div class="docsm">Data: '+date(r.data)+'</div>')+
+ '<div class="recbox"><small class="lb">Valor recebido</small><div class="recval">'+money(r.valor)+'</div><div class="docsm">('+esc(extenso(r.valor))+')</div></div>'+
+ '<p style="line-height:1.7;margin:0 0 14px">Recebi de <b>'+esc(r.clienteNome)+'</b>'+(r.documento?', CPF/CNPJ '+esc(r.documento):'')+', a importância de <b>'+money(r.valor)+'</b> ('+esc(extenso(r.valor))+'), referente a '+esc(r.referente)+'.</p>'+
+ '<div class="docgrid"><div><small class="lb">Forma de pagamento</small><b>'+esc(r.forma)+'</b></div><div><small class="lb">Data do pagamento</small><b>'+date(r.data)+'</b></div></div>'+
+ (sd?'<div class="docsec"><h4>Orçamento '+esc(sd.q.numero)+'</h4><div class="totals"><div class="totalrow"><span>Total do orçamento</span><b>'+money(sd.tot)+'</b></div><div class="totalrow"><span>Recebido até este recibo</span><b>'+money(sd.pago)+'</b></div><div class="totalrow final"><span>Saldo restante</span><strong>'+money(sd.saldo)+'</strong></div></div></div>':'')+
+ (r.obs?'<div class="docsec"><h4>Observações</h4><div style="white-space:pre-line;overflow-wrap:anywhere">'+esc(r.obs)+'</div></div>':'')+
+ '<div class="docsig"><div>'+esc(e.responsavel||e.nome||'Quem recebeu')+'<br><span class="docsm">'+esc([e.nome,e.documento].filter(Boolean).join(' | '))+'</span></div></div></div>';
+}
+function receiptText(r){
+ const e=db.empresa,sd=recSaldo(r),L=[];
+ L.push('*RECIBO '+r.numero+'*'+(e.nome?' - '+e.nome:''));
+ L.push('Recebi de '+r.clienteNome+(r.documento?' (CPF/CNPJ '+r.documento+')':'')+' a importância de *'+money(r.valor)+'* ('+extenso(r.valor)+').');
+ L.push('Referente a: '+r.referente);
+ L.push('Forma de pagamento: '+r.forma);
+ L.push('Data: '+date(r.data));
+ if(sd){L.push('');L.push('Orçamento '+sd.q.numero+': total '+money(sd.tot)+' | recebido '+money(sd.pago)+' | saldo '+money(sd.saldo))}
+ if(r.obs)L.push('','Obs: '+r.obs);
+ return L.join('\n');
+}
+async function receiptPdf(r){
+ const e=db.empresa,d=new Doc(r.numero,await logoJpeg()),p=d.p,M=d.M,R=d.R,sd=recSaldo(r);
+ d.header('RECIBO',r.numero);
+ p.setFont(false);p.setSize(9);
+ const ex='('+extenso(r.valor)+')',el=p.split(ex,R-M-10),bh=22+el.length*4.4;
+ p.setFill([240,246,253]);p.rect(M,d.y,R-M,bh);
+ p.setFont(true);p.setSize(8);p.setText(C_MUT);p.text('VALOR RECEBIDO',M+5,d.y+6.5);
+ p.setSize(19);p.setText(C_ACC);p.text(money(r.valor),M+5,d.y+15.5);
+ p.setFont(false);p.setSize(9);p.setText(C_INK);el.forEach((l,i)=>p.text(l,M+5,d.y+21+i*4.4));
+ d.y+=bh+8;
+ d.para('Declaração','Recebi de '+r.clienteNome+(r.documento?', CPF/CNPJ '+r.documento:'')+', a importância de '+money(r.valor)+' '+ex+', referente a '+r.referente+'.');
+ d.kv('Pagador',r.clienteNome);d.kv('CPF / CNPJ',r.documento);d.kv('Forma de pagamento',r.forma);d.kv('Data do pagamento',date(r.data));
+ if(sd){
+  d.sec('Orçamento '+sd.q.numero);
+  d.kv('Total do orçamento',money(sd.tot));d.kv('Recebido até este recibo',money(sd.pago));d.kv('Saldo restante',money(sd.saldo));
+ }
+ d.para('Observações',r.obs);
+ d.sign(e.responsavel||e.nome||'Quem recebeu','',[e.nome,e.documento].filter(Boolean).join(' | '));
+ return d.bytes();
+}
+function viewReceipt(r){
+ if(!r)return;
+ modal({title:'Recibo '+r.numero,wide:true,cancel:'Fechar',body:receiptDoc(r),
+ actions:[
+  {label:'Enviar PDF',cls:'primary',fn:()=>deliver(()=>receiptPdf(r),r.numero+'.pdf','share',r.numero+' - '+r.clienteNome,receiptText(r))},
+  {label:'Baixar PDF',fn:()=>deliver(()=>receiptPdf(r),r.numero+'.pdf','save')},
+  {label:'WhatsApp',fn:()=>openWa(recPhone(r),receiptText(r))},
+  {label:'Copiar texto',fn:()=>copyText(receiptText(r),'Texto copiado. É só colar no WhatsApp.')},
+  {label:'Editar',fn:()=>receiptForm(r)},{label:'Excluir',cls:'danger',fn:()=>delReceipt(r)}]});
 }
 
 /* ----- PMOC ----- */
